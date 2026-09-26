@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e0f1730-161d-4f3b-b27e-bc8734a53b39" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/handlers/Task.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/handlers/FillBlankTask1_1.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/handlers/VocabularyTask1_2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -16,8 +17,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
