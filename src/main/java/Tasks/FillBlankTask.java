@@ -1,17 +1,18 @@
-package main.java.handlers;
+package main.java.Tasks;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-public class FillBlankTask1_1 implements Task{
+public class FillBlankTask implements Task {
+    private static final Map<String, String> SENTENCES = createDatabase();
+
     @Override
     public void start(Scanner scanner) {
         System.out.println("\n=== ЗАДАНИЕ: ЗАПОЛНИ ПРОПУСК ===");
-        Map<String, String> sentences = new HashMap<>();
-        fillDatabase(sentences);
         int score = 0;
-        int totalQuestions = sentences.size();
+        int totalQuestions = SENTENCES.size();
         System.out.println("Вставь пропущенное слово:");
-        for (Map.Entry<String, String> entry : sentences.entrySet()) {
+        for (Map.Entry<String, String> entry : SENTENCES.entrySet()) {
             String taskSentence = entry.getKey();
             String correctAnswer = entry.getValue();
             System.out.print(taskSentence + " ");
@@ -24,9 +25,10 @@ public class FillBlankTask1_1 implements Task{
             System.out.printf("Ошибка. Правильный ответ: %s%n%n", correctAnswer);
            }
         }
-        printResult(score, totalQuestions);
+        CoreUtils.printResult(score, totalQuestions);
     }
-    private void fillDatabase(Map<String, String> db) {
+    private static Map<String, String> createDatabase() {
+        Map<String, String> db = new HashMap<>();
         db.put("I ___ to the cinema yesterday.", "went");
         db.put("She ___ coffee every morning.", "drinks");
         db.put("Moscow is a very ___ city.", "big");
@@ -39,22 +41,6 @@ public class FillBlankTask1_1 implements Task{
         db.put("My brother ___ twenty years old next Monday. (be)", "will be");
         db.put("I think she ___ pass the exam easily. (will)", "will");
         db.put("We ___ visit our grandparents this weekend. (are going to)", "are going to");
+        return db;
     }
-    private void printResult(int score, int total) {
-        double percentage = ((double) score / total) * 100;
-        System.out.println("==============================");
-        System.out.println("ТЕСТ ПО ПРЕДЛОЖЕНИЯМ ЗАВЕРШЕН");
-        System.out.println("Правильных ответов: " + score + "/" + total);
-        if (percentage == 100) {
-            System.out.println("Идеально! Вы мастер грамматики!");
-        }
-        else if (percentage > 70) {
-            System.out.println("Хорошо! Но есть что повторить.");
-        }
-        else {
-            System.out.println("Нужно подучить правила.");
-        }
-        System.out.println("==============================\n");
-    }
-
 }

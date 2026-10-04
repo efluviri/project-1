@@ -1,4 +1,4 @@
-package main.java.handlers;
+package main.java.Tasks;
 import java.util.Scanner;
 
 public interface Task {

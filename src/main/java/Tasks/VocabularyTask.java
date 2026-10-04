@@ -1,23 +1,25 @@
-package main.java.handlers;
+package main.java.Tasks;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class VocabularyTask1_2 implements Task{
+public class VocabularyTask implements Task {
+    private static final Map<String, String> FOOD_MAP = createFoodVocab();
+    private static final Map<String, String> TRAVEL_MAP = createTravelVocab();
+
     @Override
     public void start(Scanner scanner){
         System.out.println("\n=== ЗАДАНИЕ: ПЕРЕВЕДИ СЛОВО ===");
         printTopicMenu();
         String choice = scanner.nextLine().trim();
-        Map<String, String> vocabulary = new HashMap<>();
+        Map<String, String> vocabulary;
         switch (choice.toLowerCase()) {
-            case "1":
-            case "food":
-                fillFood(vocabulary);
+            case "1","food":
+                vocabulary=FOOD_MAP;
                 break;
-        case "2":
-        case "travel":
-            fillTravel(vocabulary);
+        case "2","travel":
+            vocabulary=TRAVEL_MAP;
             break;
         default:
             System.out.println("Неверный ввод. Выходим из режима словаря.");
@@ -28,9 +30,9 @@ public class VocabularyTask1_2 implements Task{
         int totalQuestions = vocabulary.size();
         System.out.println("\n--- НАЧАЛО ТЕСТА ---");
         for (Map.Entry<String, String> entry : vocabulary.entrySet()) {
-            System.out.print("Перевод слова '" + entry.getKey() + "': ");
+            System.out.print("Перевод слова '" + entry.getValue() + "': ");
             String userInput = scanner.nextLine().trim().toLowerCase();
-            if (userInput.equalsIgnoreCase(entry.getValue())) {
+            if (userInput.equalsIgnoreCase(entry.getKey())) {
                 System.out.println("Верно!");
                 score++;
             }
@@ -38,7 +40,7 @@ public class VocabularyTask1_2 implements Task{
                 System.out.printf("Ошибка. Правильный ответ: %s%n%n", entry.getValue());
             }
         }
-        printResult(score, totalQuestions);
+        CoreUtils.printResult(score, totalQuestions);
     }
     private void printTopicMenu() {
         System.out.println("Выберите тему:");
@@ -46,33 +48,21 @@ public class VocabularyTask1_2 implements Task{
         System.out.println("[2] Travel (Путешествия)");
         System.out.print("Ваш выбор (номер или название): ");
     }
-    private void fillFood(Map<String, String> vocab) {
+    private static Map<String, String> createFoodVocab() {
+        Map<String, String> vocab = new HashMap<>();
         vocab.put("apple", "яблоко");
         vocab.put("bread", "хлеб");
         vocab.put("milk", "молоко");
         vocab.put("egg", "яйцо");
+        return vocab;
     }
-    private void fillTravel(Map<String, String> vocab) {
+    private static Map<String, String> createTravelVocab() {
+        Map<String, String> vocab = new HashMap<>();
         vocab.put("airport", "аэропорт");
         vocab.put("ticket", "билет");
         vocab.put("hotel", "отель");
         vocab.put("train", "поезд");
-    }
-    private void printResult(int score, int total) {
-        double percentage = ((double) score / total) * 100;
-        System.out.println("==============================");
-        System.out.println("ТЕСТ ЗАВЕРШЕН");
-        System.out.println("Правильных ответов: " + score + "/" + total);
-        if (percentage == 100) {
-            System.out.println("Идеально!");
-        }
-        else if (percentage > 70) {
-            System.out.println("Хорошо!");
-        }
-        else {
-            System.out.println("Нужно повторить слова.");
-        }
-        System.out.println("==============================\n");
+        return vocab;
     }
 }
 
