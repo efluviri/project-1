@@ -1,5 +1,4 @@
 package main.java.handlers;
-
 public class CamelCaseHandler implements TextHandler {
     @Override
     public String handle(String input){

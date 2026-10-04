@@ -31,7 +31,7 @@ public class ConsoleApp {
                 return;
 
             case "1.3":
-                new lesson1_3().start(scanner);
+                new Lesson1_3().start(scanner);
                 scanner.close();
                 return;
 

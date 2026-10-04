@@ -3,23 +3,51 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class lesson1_3 {
-    private static class Lesson {
-        String rule;
-        Map<String, String> tasks;
-        Lesson(String rule, Map<String, String> tasks) {
-            this.rule = rule;
-            this.tasks = tasks;
+public class Lesson1_3 implements Task {
+    public void start(Scanner scanner) {
+        System.out.println("""
+                УРОКИ ПО ТЕМАМ
+                [1] Настоящее время
+                [2] Будущее время
+                [3] Прошедшее время
+                """);
+        Map<String, Lesson> lessons = new HashMap<>();
+        createLessons(lessons);
+        String choice = scanner.nextLine().trim();
+        Lesson lesson = lessons.get(choice);
+        if (lesson == null) {
+            System.out.println("Неверный выбор. Возврат в меню.");
+            return;
         }
-    }
-    private static final Map<String, Lesson> LESSONS = new HashMap<>();
+        System.out.println(lesson.rule);
+        scanner.nextLine();
+        System.out.println("\n[ОТРАБОТКА]");
+        int score = 0;
+        int tasksSize = lesson.tasks.size();
+        int i = 1;
 
-    static {
+        for (Map.Entry<String, String> entry : lesson.tasks.entrySet()) {
+            String taskSentence = entry.getKey();
+            String trueAnswer = entry.getValue();
+            System.out.println("\nЗадание " + i++ + " из " + tasksSize + ":");
+            System.out.print(taskSentence + " ");
+            String input = scanner.nextLine().trim();
+            if (input.equalsIgnoreCase(trueAnswer)) {
+                System.out.println("Верно");
+                score++;
+            } else {
+                System.out.println("Неверно. Правильный ответ: " + trueAnswer);
+            }
+        }
+        printResult(score, tasksSize);
+    }
+
+    private void createLessons(Map<String, Lesson> lessons) {
         Map<String, String> t1 = new HashMap<>();
         t1.put("I ___ (to go) to school every day.", "go");
         t1.put("She ___ (to work) in a bank.", "works");
         t1.put("They ___ (to play) football on Sundays.", "play");
-        LESSONS.put("1", new Lesson("""
+        lessons.put("1", new Lesson("""
              Правило:
                 Present Simple — для регулярных действий, привычек и фактов.
                 Формула:
@@ -34,7 +62,7 @@ public class lesson1_3 {
         t2.put("I ___ (to call) you tomorrow.", "will call");
         t2.put("She ___ (to travel) to Japan.", "will travel");
         t2.put("They ___ (to come) back soon.", "will come");
-        LESSONS.put("2", new Lesson("""
+        lessons.put("2", new Lesson("""
              Правило:
                 Future Simple — для действий в будущем.
                 Формула:
@@ -48,7 +76,7 @@ public class lesson1_3 {
         t3.put("I ___ (to go) to the park yesterday.", "went");
         t3.put("She ___ (to work) all night.", "worked");
         t3.put("They ___ (to visit) London last year.", "visited");
-        LESSONS.put("3", new Lesson("""
+        lessons.put("3", new Lesson("""
              Правило:
                  Past Simple — для действий в прошлом.
                  Формула:
@@ -58,40 +86,12 @@ public class lesson1_3 {
                    She worked all night.
              """, t3));
     }
-
-    public void start(Scanner scanner) {
-        System.out.println("""
-                УРОКИ ПО ТЕМАМ
-                [1] Настоящее время
-                [2] Будущее время
-                [3] Прошедшее время
-                """);
-
-        Lesson lesson = LESSONS.get(scanner.nextLine().trim());
-        if (lesson == null) {
-            System.out.println("Неверный выбор. Возврат в меню.");
-            return;
+    private static class Lesson {
+        String rule;
+        Map<String, String> tasks;
+        Lesson(String rule, Map<String, String> tasks) {
+            this.rule = rule;
+            this.tasks = tasks;
         }
-
-        System.out.println(lesson.rule);
-        scanner.nextLine();
-
-        System.out.println("\n[ОТРАБОТКА]");
-        int score = 0, total = lesson.tasks.size(), i = 1;
-        for (Map.Entry<String, String> e : lesson.tasks.entrySet()) {
-            System.out.println("\nЗадание " + i++ + " из " + total + ":");
-            System.out.println(e.getKey());
-            System.out.print("Ваш ответ: ");
-            if (scanner.nextLine().trim().equalsIgnoreCase(e.getValue())) {
-                System.out.println("Верно!");
-                score++;
-            } else {
-                System.out.println("Неверно. Правильный ответ: " + e.getValue());
-            }
-        }
-
-        System.out.println("\n=== РЕЗУЛЬТАТ ===");
-        System.out.println("Правильных ответов: " + score + " из " + total);
-        scanner.nextLine();
     }
 }
