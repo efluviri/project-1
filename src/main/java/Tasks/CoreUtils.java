@@ -6,10 +6,10 @@ public class CoreUtils {
         System.out.println("==============================");
         System.out.println("ТЕСТ ЗАВЕРШЕН");
         System.out.println("Правильных ответов: " + score + "/" + total);
-        if (percentage == 100) {
+        if (percentage == 100.0) {
             System.out.println("Идеально!");
         }
-        else if (percentage > 70) {
+        else if (percentage > 70.0) {
             System.out.println("Хорошо!");
         }
         else {
