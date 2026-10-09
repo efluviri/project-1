@@ -12,20 +12,7 @@ public class FillBlankTask implements Task {
         int score = 0;
         int totalQuestions = SENTENCES.size();
         System.out.println("Вставь пропущенное слово:");
-        for (Map.Entry<String, String> entry : SENTENCES.entrySet()) {
-            String taskSentence = entry.getKey();
-            String correctAnswer = entry.getValue();
-            System.out.print(taskSentence + " ");
-            String userInput = scanner.nextLine().trim().toLowerCase();
-           if (userInput.equalsIgnoreCase(correctAnswer)) {
-               System.out.println("Верно! \n");
-               score++;
-           }
-           else {
-            System.out.printf("Ошибка. Правильный ответ: %s%n%n", correctAnswer);
-           }
-        }
-        CoreUtils.printResult(score, totalQuestions);
+        CoreUtils.processTasks(scanner,SENTENCES);
     }
     private static Map<String, String> createDatabase() {
         Map<String, String> db = new HashMap<>();

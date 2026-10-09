@@ -26,21 +26,7 @@ public class VocabularyTask implements Task {
             return;
         }
         if (vocabulary.isEmpty()) return;
-        int score = 0;
-        int totalQuestions = vocabulary.size();
-        System.out.println("\n--- НАЧАЛО ТЕСТА ---");
-        for (Map.Entry<String, String> entry : vocabulary.entrySet()) {
-            System.out.print("Перевод слова '" + entry.getValue() + "': ");
-            String userInput = scanner.nextLine().trim().toLowerCase();
-            if (userInput.equalsIgnoreCase(entry.getKey())) {
-                System.out.println("Верно!");
-                score++;
-            }
-            else {
-                System.out.printf("Ошибка. Правильный ответ: %s%n%n", entry.getValue());
-            }
-        }
-        CoreUtils.printResult(score, totalQuestions);
+        CoreUtils.processTasks(scanner,vocabulary);
     }
     private void printTopicMenu() {
         System.out.println("Выберите тему:");
@@ -50,18 +36,18 @@ public class VocabularyTask implements Task {
     }
     private static Map<String, String> createFoodVocab() {
         Map<String, String> vocab = new HashMap<>();
-        vocab.put("apple", "яблоко");
-        vocab.put("bread", "хлеб");
-        vocab.put("milk", "молоко");
-        vocab.put("egg", "яйцо");
+        vocab.put("яблоко", "apple");
+        vocab.put("хлеб", "bread");
+        vocab.put("молоко", "milk");
+        vocab.put("яйцо", "egg");
         return vocab;
     }
     private static Map<String, String> createTravelVocab() {
         Map<String, String> vocab = new HashMap<>();
-        vocab.put("airport", "аэропорт");
-        vocab.put("ticket", "билет");
-        vocab.put("hotel", "отель");
-        vocab.put("train", "поезд");
+        vocab.put("аэропорт", "airport");
+        vocab.put("билет", "ticket");
+        vocab.put("отель", "hotel");
+        vocab.put("поезд", "train");
         return vocab;
     }
 }

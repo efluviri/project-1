@@ -1,4 +1,7 @@
-package main.java.Tasks;
+
+import main.java.Tasks.FillBlankTask;
+import main.java.Tasks.RuleTask;
+import main.java.Tasks.VocabularyTask;
 
 import java.util.Scanner;
 public class ConsoleApp {

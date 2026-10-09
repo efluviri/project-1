@@ -9,10 +9,8 @@ public class RuleTask implements Task {
     private static final Map<String, String> FUTURE_MAP = createFutureSimpleTasks();
     private static final Map<String, String> PAST_MAP = createPastSimpleTasks();
 
-    private  String rule;
-    private  Map<String, String> tasks;
-
-    public RuleTask(){}
+    private String rule;
+    private Map<String, String> tasks;
 
     @Override
     public void start(Scanner scanner) {
@@ -24,8 +22,7 @@ public class RuleTask implements Task {
                 [3] Прошедшее время
                 """);
         String choice = scanner.nextLine().trim();
-        //Map<String, String> lessonContent;
-        RuleTask lesson = null;
+
         switch (choice) {
             case "1":
                 this.rule = getPresentRule();
@@ -44,27 +41,9 @@ public class RuleTask implements Task {
                 return;
         }
 
-        System.out.println(this.rule);
-        scanner.nextLine();
+        System.out.println(rule);
         System.out.println("\n[ОТРАБОТКА]");
-        int score = 0;
-        int tasksSize = tasks.size();
-        int i = 1;
-
-        for (Map.Entry<String, String> entry : tasks.entrySet()) {
-            String taskSentence = entry.getKey();
-            String trueAnswer = entry.getValue();
-            System.out.println("\nЗадание " + i++ + " из " + tasksSize + ":");
-            System.out.print(taskSentence + " ");
-            String input = scanner.nextLine().trim();
-            if (input.equalsIgnoreCase(trueAnswer)) {
-                System.out.println("Верно");
-                score++;
-            } else {
-                System.out.println("Неверно. Правильный ответ: " + trueAnswer);
-            }
-        }
-        CoreUtils.printResult(score, tasksSize);
+        CoreUtils.processTasks(scanner,tasks);
     }
 
     public String getFutureRule() {
