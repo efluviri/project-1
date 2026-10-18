@@ -1,4 +1,4 @@
-package Tasks;
+package main.java.Tasks;
 
 public class MessageService {
     public void printMessage() {

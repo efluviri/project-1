@@ -1,6 +1,4 @@
-package Tasks;
-
-import java.sql.SQLException;
+package main.java.Tasks;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;

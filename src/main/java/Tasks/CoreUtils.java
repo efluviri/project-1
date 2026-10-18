@@ -1,4 +1,4 @@
-package Tasks;
+package main.java.Tasks;
 import java.util.Map;
 import java.util.Scanner;
 import java.sql.*;

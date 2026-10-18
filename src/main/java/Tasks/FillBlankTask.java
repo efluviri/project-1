@@ -1,9 +1,8 @@
-package Tasks;
-
+package main.java.Tasks;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.sql.*;
+
 public class FillBlankTask implements Task {
     private static final Map<String, String> SENTENCES = createDatabase();
 
