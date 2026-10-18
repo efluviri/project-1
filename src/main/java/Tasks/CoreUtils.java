@@ -1,4 +1,4 @@
-package main.java.Tasks;
+package Tasks;
 import java.util.Map;
 import java.util.Scanner;
 public class CoreUtils {
