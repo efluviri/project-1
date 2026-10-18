@@ -3,14 +3,14 @@ package Tasks;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.sql.*;
 public class FillBlankTask implements Task {
     private static final Map<String, String> SENTENCES = createDatabase();
 
     @Override
     public void start(Scanner scanner) {
+
         System.out.println("\n=== ЗАДАНИЕ: ЗАПОЛНИ ПРОПУСК ===");
-        int score = 0;
-        int totalQuestions = SENTENCES.size();
         System.out.println("Вставь пропущенное слово:");
         CoreUtils.processTasks(scanner,SENTENCES);
     }

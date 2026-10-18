@@ -3,7 +3,7 @@ package Tasks;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-
+import java.sql.*;
 public class VocabularyTask implements Task {
     private static final Map<String, String> FOOD_MAP = createFoodVocab();
     private static final Map<String, String> TRAVEL_MAP = createTravelVocab();
