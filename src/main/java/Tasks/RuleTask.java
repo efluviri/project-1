@@ -1,9 +1,7 @@
 package main.java.Tasks;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-
 public class RuleTask implements Task {
     private static final Map<String, String> PRESENT_MAP = createPresentSimpleTasks();
     private static final Map<String, String> FUTURE_MAP = createFutureSimpleTasks();
@@ -14,6 +12,7 @@ public class RuleTask implements Task {
 
     @Override
     public void start(Scanner scanner) {
+
         System.out.println("\n=== ИЗУЧЕНИЕ ПРАВИЛА И ОТРАБОТКА ===");
         System.out.println("""
                 УРОКИ ПО ТЕМАМ
