@@ -13,19 +13,23 @@ public class VocabularyTask implements Task {
         printTopicMenu();
         String choice = scanner.nextLine().trim();
         Map<String, String> vocabulary;
+
+        String mapName;
         switch (choice.toLowerCase()) {
             case "1","food":
                 vocabulary=FOOD_MAP;
+                mapName="food";
                 break;
         case "2","travel":
             vocabulary=TRAVEL_MAP;
+            mapName="travel";
             break;
         default:
             System.out.println("Неверный ввод. Выходим из режима словаря.");
             return;
         }
         if (vocabulary.isEmpty()) return;
-        CoreUtils.processTasks(scanner,vocabulary);
+        CoreUtils.processTasks(scanner,vocabulary,"vocabulary",mapName);
     }
     private void printTopicMenu() {
         System.out.println("Выберите тему:");

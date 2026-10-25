@@ -11,7 +11,7 @@ public class FillBlankTask implements Task {
 
         System.out.println("\n=== ЗАДАНИЕ: ЗАПОЛНИ ПРОПУСК ===");
         System.out.println("Вставь пропущенное слово:");
-        CoreUtils.processTasks(scanner,SENTENCES);
+        CoreUtils.processTasks(scanner,SENTENCES,"fillblank","");
     }
     private static Map<String, String> createDatabase() {
         Map<String, String> db = new HashMap<>();
