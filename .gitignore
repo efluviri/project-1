@@ -35,4 +35,5 @@ bin/
 ### Java build ###
 target/
 build/
+lib/
 
