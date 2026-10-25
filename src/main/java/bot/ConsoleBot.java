@@ -16,13 +16,17 @@ public class ConsoleBot implements Bot {
             System.err.println("[ERROR] Не удалось создать базу данных.");
             return;
         }
+
+        final boolean[] InTask = {false};
         MessageService messageService = new MessageService();
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("\n");
-                messageService.printMessage();
+                if (!InTask[0]) {
+                    System.out.println("\n");
+                    messageService.printMessage();
+                }
             }
         }, 60000, 60000);
 
@@ -33,23 +37,35 @@ public class ConsoleBot implements Bot {
             System.out.println("[0] узнать статистику за всё время");
             System.out.println("[0.1] узнать статистику по темам");
             String choice = scanner.nextLine();
+
+
             switch (choice) {
                 case "1":
+                    InTask[0] = true;
                     new FillBlankTask().start(scanner);
+                    InTask[0] = false;
                     break;
 
                 case "2":
+                    InTask[0] = true;
                     new VocabularyTask().start(scanner);
+                    InTask[0] = false;
                     break;
 
                 case "3":
+                    InTask[0] = true;
                     new RuleTask().start(scanner);
+                    InTask[0] = false;
                     break;
                 case "0":
+                    InTask[0] = true;
                     CoreUtils.printAllTimeStats("test_user");
+                    InTask[0] = false;
                     break;
                 case "0.1":
+                    InTask[0] = true;
                     CoreUtils.printProgress("test_user");
+                    InTask[0] = false;
                     break;
 
                 default:
