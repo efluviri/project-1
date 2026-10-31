@@ -1,9 +1,7 @@
 package main.java.Tasks;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-
 public class RuleTask implements Task {
     private static final Map<String, String> PRESENT_MAP = createPresentSimpleTasks();
     private static final Map<String, String> FUTURE_MAP = createFutureSimpleTasks();
@@ -11,9 +9,12 @@ public class RuleTask implements Task {
 
     private String rule;
     private Map<String, String> tasks;
+    private String taskType="rule";
+    private String mapName;
 
     @Override
     public void start(Scanner scanner) {
+
         System.out.println("\n=== ИЗУЧЕНИЕ ПРАВИЛА И ОТРАБОТКА ===");
         System.out.println("""
                 УРОКИ ПО ТЕМАМ
@@ -27,14 +28,17 @@ public class RuleTask implements Task {
             case "1":
                 this.rule = getPresentRule();
                 this.tasks = PRESENT_MAP;
+                this.mapName="present_simple";
                 break;
             case "2":
                 this.rule = getFutureRule();
                 this.tasks = FUTURE_MAP;
+                this.mapName="future_simple";
                 break;
             case "3":
                 this.rule = getPastRule();
                 this.tasks = PAST_MAP;
+                this.mapName="past_simple";
                 break;
             default:
                 System.out.println("Неверный ввод. Возврат в меню.");
@@ -43,7 +47,7 @@ public class RuleTask implements Task {
 
         System.out.println(rule);
         System.out.println("\n[ОТРАБОТКА]");
-        CoreUtils.processTasks(scanner,tasks);
+        CoreUtils.processTasks(scanner,tasks,taskType,mapName);
     }
 
     public String getFutureRule() {
