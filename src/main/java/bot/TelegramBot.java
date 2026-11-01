@@ -1,4 +1,4 @@
-package bot;
+package main.java.bot;
 
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -14,7 +14,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
 
     public TelegramBot() {
         this.telegramClient = new OkHttpTelegramClient(BOT_TOKEN);
-    }
 
     @Override
     public void consume(Update update) {
