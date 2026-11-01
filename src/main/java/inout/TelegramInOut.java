@@ -3,16 +3,16 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public class TelegramInOut implements InOut {
     private final Long chatId;
-    private final AbsSender sender;
+    private final TelegramClient client;
     private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
 
-    public TelegramInOut(Long chatId,AbsSender sender) {
+    public TelegramInOut(Long chatId,TelegramClient client) {
         this.chatId = chatId;
-        this.sender=sender;
+        this.client=client;
     }
     @Override
     public void print(String message) {
@@ -20,7 +20,7 @@ public class TelegramInOut implements InOut {
         sendMessage.setChatId(chatId.toString());
         sendMessage.setText(message);
         try {
-            sender.execute(sendMessage);
+            client.execute(sendMessage);
         } catch (TelegramApiException e) {
             System.err.println("Не удалось отправить сообщение в чат " + chatId);
         }
