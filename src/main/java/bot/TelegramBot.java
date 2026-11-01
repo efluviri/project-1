@@ -1,7 +1,6 @@
 package main.java.bot;
 
 import java.util.Map;
-import java.util.HashMap;
 import main.java.inout.*;
 import main.java.Tasks.*;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -28,7 +27,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
             telegramClient.execute(message);
         } catch (TelegramApiException e) {
             System.err.println("Ошибка отправки: " + e.getMessage());
-        }
+
+      }
     }
     @Override
     public void consume(Update update) {
