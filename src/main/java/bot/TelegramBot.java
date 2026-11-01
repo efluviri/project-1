@@ -19,7 +19,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
     @Override
     public void consume(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
 
             SendMessage message = new SendMessage(String.valueOf(chatId), "Привет! Добро пожаловать в бота для изучения английского! ");
