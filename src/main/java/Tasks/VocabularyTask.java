@@ -1,17 +1,17 @@
 package main.java.Tasks;
+import main.java.inout.InOut;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class VocabularyTask implements Task {
     private static final Map<String, String> FOOD_MAP = createFoodVocab();
     private static final Map<String, String> TRAVEL_MAP = createTravelVocab();
 
     @Override
-    public void start(Scanner scanner){
-        System.out.println("\n=== ЗАДАНИЕ: ПЕРЕВЕДИ СЛОВО ===");
-        printTopicMenu();
-        String choice = scanner.nextLine().trim();
+    public void start(InOut io){
+        io.print("\n=== ЗАДАНИЕ: ПЕРЕВЕДИ СЛОВО ===");
+        printTopicMenu(io);
+        String choice = io.readline();
         Map<String, String> vocabulary;
 
         String mapName;
@@ -25,17 +25,17 @@ public class VocabularyTask implements Task {
             mapName="travel";
             break;
         default:
-            System.out.println("Неверный ввод. Выходим из режима словаря.");
+            io.print("Неверный ввод. Выходим из режима словаря.");
             return;
         }
         if (vocabulary.isEmpty()) return;
-        CoreUtils.processTasks(scanner,vocabulary,"vocabulary",mapName);
+        CoreUtils.processTasks(io,vocabulary,"vocabulary",mapName);
     }
-    private void printTopicMenu() {
-        System.out.println("Выберите тему:");
-        System.out.println("[1] Food (Еда)");
-        System.out.println("[2] Travel (Путешествия)");
-        System.out.print("Ваш выбор (номер или название): ");
+    private void printTopicMenu(InOut io) {
+        io.print("Выберите тему:");
+        io.print("[1] Food (Еда)");
+        io.print("[2] Travel (Путешествия)");
+        io.print("Ваш выбор (номер или название): ");
     }
     private static Map<String, String> createFoodVocab() {
         Map<String, String> vocab = new HashMap<>();

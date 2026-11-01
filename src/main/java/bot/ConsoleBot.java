@@ -1,22 +1,24 @@
 package main.java.bot;
 
 import main.java.Tasks.*;
+import main.java.inout.ConsoleInOnt;
+import main.java.inout.InOut;
+
 import java.sql.SQLException;
-import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class ConsoleBot implements Bot {
+    public final InOut io=new ConsoleInOnt();
     @Override
     public void run() {
-        Scanner scanner = new Scanner(System.in);
+
         try {
-            CoreUtils.initDatabase();
+            CoreUtils.initDatabase(io);
         } catch (SQLException e) {
-            System.err.println("[ERROR] Не удалось создать базу данных.");
+            io.print("Не удалось создать базу данных.");
             return;
         }
-
         final boolean[] InTask = {false};
         MessageService messageService = new MessageService();
         Timer timer = new Timer(true);
@@ -24,60 +26,58 @@ public class ConsoleBot implements Bot {
             @Override
             public void run() {
                 if (!InTask[0]) {
-                    System.out.println("\n");
-                    messageService.printMessage();
+                    io.print("\n");
+                    messageService.printMessage(io);
                 }
             }
         }, 60000, 60000);
 
         while (true) {
-            System.out.println("[1] Заполнение пропущенных слов в предложении");
-            System.out.println("[2] Проверка знания слов по темам");
-            System.out.println("[3] Уроки по темам (правило и отработка)");
-            System.out.println("[0] узнать статистику за всё время");
-            System.out.println("[0.1] узнать статистику по темам");
-            String choice = scanner.nextLine();
+            String command = io.readline();
+            if ("exit".equalsIgnoreCase(command)) {
+                break;
+            }
+            io.print("[1] Заполнение пропущенных слов в предложении");
+            io.print("[2] Проверка знания слов по темам");
+            io.print("[3] Уроки по темам (правило и отработка)");
+            io.print("[0] узнать статистику за всё время");
+            io.print("[0.1] узнать статистику по темам");
 
-
-            switch (choice) {
+            switch (command) {
                 case "1":
                     InTask[0] = true;
-                    new FillBlankTask().start(scanner);
+                    new FillBlankTask().start(io);
                     InTask[0] = false;
                     break;
 
                 case "2":
                     InTask[0] = true;
-                    new VocabularyTask().start(scanner);
+                    new VocabularyTask().start(io);
                     InTask[0] = false;
                     break;
 
                 case "3":
                     InTask[0] = true;
-                    new RuleTask().start(scanner);
+                    new RuleTask().start(io);
                     InTask[0] = false;
                     break;
                 case "0":
                     InTask[0] = true;
-                    CoreUtils.printAllTimeStats("test_user");
+                    CoreUtils.printAllTimeStats("test_user",io);
                     InTask[0] = false;
                     break;
                 case "0.1":
                     InTask[0] = true;
-                    CoreUtils.printProgress("test_user");
+                    CoreUtils.printProgress("test_user",io);
                     InTask[0] = false;
                     break;
 
                 default:
-                    System.out.println("Ошибка: введен неверный номер.");
+                    io.print("Ошибка: введен неверный номер.");
                     continue;
             }
-            System.out.print("> ");
-            String line = scanner.nextLine();
-            if ("exit".equalsIgnoreCase(line)) {
-                break;
-            }
+            io.print("> ");
+
         }
-        scanner.close();
     }
 }
