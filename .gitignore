@@ -4,6 +4,7 @@
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+data/
 
 ### Eclipse ###
 .apt_generated
@@ -34,4 +35,5 @@ bin/
 ### Java build ###
 target/
 build/
+lib/
 
