@@ -10,6 +10,7 @@ import java.util.TimerTask;
 
 public class ConsoleBot implements Bot {
     public final InOut io=new ConsoleInOnt();
+    private volatile boolean InTask = false;
     @Override
     public void run() {
 
@@ -19,14 +20,14 @@ public class ConsoleBot implements Bot {
             io.print("Не удалось создать базу данных.");
             return;
         }
-        final boolean[] InTask = {false};
+
         MessageService messageService = new MessageService();
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (!InTask[0]) {
-                    io.print("\n");
+                if (!InTask) {
+                    System.out.println("\n");
                     messageService.printMessage(io);
                 }
             }
@@ -45,31 +46,32 @@ public class ConsoleBot implements Bot {
 
             switch (command) {
                 case "1":
-                    InTask[0] = true;
+                    InTask = true;
                     new FillBlankTask().start(io);
-                    InTask[0] = false;
+                    InTask = false;
                     break;
 
                 case "2":
-                    InTask[0] = true;
+                    InTask = true;
                     new VocabularyTask().start(io);
-                    InTask[0] = false;
+                    InTask = false;
                     break;
 
                 case "3":
-                    InTask[0] = true;
+                    InTask = true;
                     new RuleTask().start(io);
-                    InTask[0] = false;
+                    InTask = false;
                     break;
                 case "0":
-                    InTask[0] = true;
+                    InTask = true;
                     CoreUtils.printAllTimeStats("test_user",io);
-                    InTask[0] = false;
+                    InTask = false;
                     break;
                 case "0.1":
-                    InTask[0] = true;
+                    InTask = true;
                     CoreUtils.printProgress("test_user",io);
-                    InTask[0] = false;
+                    InTask = false;
+
                     break;
 
                 default:
