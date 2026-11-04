@@ -1,5 +1,6 @@
 package main.java.bot;
 
+import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -7,13 +8,28 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-public class TelegramBot implements LongPollingSingleThreadUpdateConsumer {
-
-    private static final String BOT_TOKEN = "9108924329:AAEVWx-cz07LcZM2deW6e-QcV-ImP08zbbs";
+public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
+    private final String BOT_TOKEN;
     private final TelegramClient telegramClient;
 
-    public TelegramBot() {
+    public TelegramBot(String token) {
+        this.BOT_TOKEN = token;
         this.telegramClient = new OkHttpTelegramClient(BOT_TOKEN);
+    }
+
+    @Override
+    public void run() {
+        System.out.println("Запуск бота...");
+        try (TelegramBotsLongPollingApplication app = new TelegramBotsLongPollingApplication()) {
+            app.registerBot(BOT_TOKEN, this); // <-- Передаем "this", так как мы и есть бот
+            System.out.println("Бот успешно запущен и ждет сообщений!");
+            Thread.currentThread().join();
+        } catch (Exception e) {
+            System.err.println("Ошибка при запуске бота:");
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void consume(Update update) {
