@@ -11,11 +11,13 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
     private final String BOT_TOKEN;
+
     private final TelegramClient telegramClient;
     private final Map<Long, TelegramInOut> activeDialogs = new ConcurrentHashMap<>();
     private final ExecutorService taskExecutor = Executors.newCachedThreadPool();
@@ -29,7 +31,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
     public void run() {
         System.out.println("Запуск бота...");
         try (TelegramBotsLongPollingApplication app = new TelegramBotsLongPollingApplication()) {
-            app.registerBot(BOT_TOKEN, this); // <-- Передаем "this", так как мы и есть бот
+            app.registerBot(BOT_TOKEN, this);
             System.out.println("Бот успешно запущен и ждет сообщений!");
             Thread.currentThread().join();
         } catch (Exception e) {
