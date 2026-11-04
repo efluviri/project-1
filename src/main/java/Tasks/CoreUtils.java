@@ -2,7 +2,6 @@ package main.java.Tasks;
 import main.java.inout.InOut;
 
 import java.util.Map;
-import java.util.Scanner;
 import java.sql.*;
 public class CoreUtils {
     public static final String DB_PATH = "data/statistics.db";

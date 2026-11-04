@@ -16,7 +16,15 @@
         <SOURCES />
       </library>
     </orderEntry>
+<<<<<<< HEAD
     <orderEntry type="library" name="telegram.telegrambots.client" level="project" />
     <orderEntry type="library" name="telegram.telegrambots.longpolling" level="project" />
+=======
+    <orderEntry type="library" name="telegrambots-6.7.0" level="project" />
+    <orderEntry type="library" name="sqlite-jdbc-3.42.0.0" level="project" />
+    <orderEntry type="library" name="telegrambots-meta-6.7.0" level="project" />
+    <orderEntry type="library" name="telegrambots-longpolling-10.3.0" level="project" />
+    <orderEntry type="library" name="telegrambots-client-v9.1.0" level="project" />
+>>>>>>> be988dfdd2487f0c9b2bbf113586a768ce100b4d
   </component>
 </module>
