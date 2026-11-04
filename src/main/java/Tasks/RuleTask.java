@@ -1,7 +1,9 @@
 package main.java.Tasks;
+import main.java.inout.InOut;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
+
 public class RuleTask implements Task {
     private static final Map<String, String> PRESENT_MAP = createPresentSimpleTasks();
     private static final Map<String, String> FUTURE_MAP = createFutureSimpleTasks();
@@ -13,16 +15,16 @@ public class RuleTask implements Task {
     private String mapName;
 
     @Override
-    public void start(Scanner scanner) {
+    public void start(InOut io,long chatId) {
 
-        System.out.println("\n=== ИЗУЧЕНИЕ ПРАВИЛА И ОТРАБОТКА ===");
-        System.out.println("""
+        io.print("\n=== ИЗУЧЕНИЕ ПРАВИЛА И ОТРАБОТКА ===");
+        io.print("""
                 УРОКИ ПО ТЕМАМ
                 [1] Настоящее время
                 [2] Будущее время
                 [3] Прошедшее время
                 """);
-        String choice = scanner.nextLine().trim();
+        String choice = io.readline();
 
         switch (choice) {
             case "1":
@@ -41,13 +43,13 @@ public class RuleTask implements Task {
                 this.mapName="past_simple";
                 break;
             default:
-                System.out.println("Неверный ввод. Возврат в меню.");
+                io.print("Неверный ввод. Возврат в меню.");
                 return;
         }
 
-        System.out.println(rule);
-        System.out.println("\n[ОТРАБОТКА]");
-        CoreUtils.processTasks(scanner,tasks,taskType,mapName);
+        io.print(rule);
+        io.print("\n[ОТРАБОТКА]");
+        CoreUtils.processTasks(io,chatId,tasks,taskType,mapName);
     }
 
     public String getFutureRule() {
