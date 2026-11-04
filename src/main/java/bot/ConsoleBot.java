@@ -1,7 +1,7 @@
 package main.java.bot;
 
 import main.java.Tasks.*;
-import main.java.inout.ConsoleInOnt;
+import main.java.inout.ConsoleInOut;
 import main.java.inout.InOut;
 
 import java.sql.SQLException;
@@ -9,7 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class ConsoleBot implements Bot {
-    public final InOut io=new ConsoleInOnt();
+    public final InOut io=new ConsoleInOut();
     private volatile boolean InTask = false;
     @Override
     public void run() {
@@ -38,6 +38,7 @@ public class ConsoleBot implements Bot {
             if ("exit".equalsIgnoreCase(command)) {
                 break;
             }
+            InTask = true;
             io.print("[1] Заполнение пропущенных слов в предложении");
             io.print("[2] Проверка знания слов по темам");
             io.print("[3] Уроки по темам (правило и отработка)");
@@ -46,31 +47,21 @@ public class ConsoleBot implements Bot {
 
             switch (command) {
                 case "1":
-                    InTask = true;
-                    new FillBlankTask().start(io);
-                    InTask = false;
+                    new FillBlankTask().start(io,1L);
                     break;
 
                 case "2":
-                    InTask = true;
-                    new VocabularyTask().start(io);
-                    InTask = false;
+                    new VocabularyTask().start(io,1L);
                     break;
 
                 case "3":
-                    InTask = true;
-                    new RuleTask().start(io);
-                    InTask = false;
+                    new RuleTask().start(io,1L);
                     break;
                 case "0":
-                    InTask = true;
-                    CoreUtils.printAllTimeStats("test_user",io);
-                    InTask = false;
+                    CoreUtils.printAllTimeStats(1L,io);
                     break;
                 case "0.1":
-                    InTask = true;
-                    CoreUtils.printProgress("test_user",io);
-                    InTask = false;
+                    CoreUtils.printProgress(1L,io);
 
                     break;
 
@@ -78,6 +69,7 @@ public class ConsoleBot implements Bot {
                     io.print("Ошибка: введен неверный номер.");
                     continue;
             }
+            InTask = false;
             io.print("> ");
 
         }

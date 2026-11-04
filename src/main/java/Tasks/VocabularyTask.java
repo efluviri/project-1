@@ -8,7 +8,7 @@ public class VocabularyTask implements Task {
     private static final Map<String, String> TRAVEL_MAP = createTravelVocab();
 
     @Override
-    public void start(InOut io){
+    public void start(InOut io,long chatId){
         io.print("\n=== ЗАДАНИЕ: ПЕРЕВЕДИ СЛОВО ===");
         printTopicMenu(io);
         String choice = io.readline();
@@ -29,7 +29,7 @@ public class VocabularyTask implements Task {
             return;
         }
         if (vocabulary.isEmpty()) return;
-        CoreUtils.processTasks(io,vocabulary,"vocabulary",mapName);
+        CoreUtils.processTasks(io,chatId,vocabulary,"vocabulary",mapName);
     }
     private void printTopicMenu(InOut io) {
         io.print("Выберите тему:");

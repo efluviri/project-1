@@ -7,11 +7,11 @@ public class FillBlankTask implements Task {
     private static final Map<String, String> SENTENCES = createDatabase();
 
     @Override
-    public void start(InOut io) {
+    public void start(InOut io,long chatId) {
 
         io.print("\n=== ЗАДАНИЕ: ЗАПОЛНИ ПРОПУСК ===");
         io.print("Вставь пропущенное слово:");
-        CoreUtils.processTasks(io,SENTENCES,"fillblank","");
+        CoreUtils.processTasks(io,chatId,SENTENCES,"fillblank","");
     }
     private static Map<String, String> createDatabase() {
         Map<String, String> db = new HashMap<>();

@@ -1,7 +1,7 @@
 package main.java.inout;
 import java.util.Scanner;
 
-public class ConsoleInOnt implements InOut {
+public class ConsoleInOut implements InOut {
     private final Scanner scanner = new Scanner(System.in);
     @Override
     public void print(String message){

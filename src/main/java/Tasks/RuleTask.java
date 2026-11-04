@@ -15,7 +15,7 @@ public class RuleTask implements Task {
     private String mapName;
 
     @Override
-    public void start(InOut io) {
+    public void start(InOut io,long chatId) {
 
         io.print("\n=== ИЗУЧЕНИЕ ПРАВИЛА И ОТРАБОТКА ===");
         io.print("""
@@ -49,7 +49,7 @@ public class RuleTask implements Task {
 
         io.print(rule);
         io.print("\n[ОТРАБОТКА]");
-        CoreUtils.processTasks(io,tasks,taskType,mapName);
+        CoreUtils.processTasks(io,chatId,tasks,taskType,mapName);
     }
 
     public String getFutureRule() {

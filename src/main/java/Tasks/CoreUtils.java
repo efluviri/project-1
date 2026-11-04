@@ -26,14 +26,14 @@ public class CoreUtils {
             io.print(" Не удалось создать таблицу базы данных:");
         }
     }
-    public static void logAnswer(String userId, String taskId, boolean isCorrect,InOut io) {
+    public static void logAnswer(long userId, String taskId, boolean isCorrect,InOut io) {
         try (
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
                 PreparedStatement pstmt = conn.prepareStatement(
                         "INSERT INTO user_answers(user_id, task_id, is_correct) VALUES(?, ?, ?)"
                 )
         ) {
-            pstmt.setString(1, userId);
+            pstmt.setString(1, Long.toString(userId));
             pstmt.setString(2, taskId);
             pstmt.setBoolean(3, isCorrect);
             pstmt.executeUpdate();
@@ -41,7 +41,7 @@ public class CoreUtils {
             io.print(" Ошибка записи статистики:");
         }
     }
-    public static void printAllTimeStats(String userId,InOut io) {
+    public static void printAllTimeStats(long userId,InOut io) {
         String sqlCount = """ 
                     SELECT COUNT(*) AS total,
                      SUM(is_correct) AS correct
@@ -52,7 +52,7 @@ public class CoreUtils {
                 PreparedStatement pstmt = conn.prepareStatement(sqlCount)
 
         ) {
-            pstmt.setString(1, userId);
+            pstmt.setLong(1, userId);
             ResultSet rs = pstmt.executeQuery();
             if (!rs.next()) {
                 io.print("\nУ тебя пока нет результатов.");
@@ -73,7 +73,7 @@ public class CoreUtils {
             io.print(" Не удалось получить статистику:");
         }
     }
-    public static void printProgress(String userId,InOut io){
+    public static void printProgress(long userId,InOut io){
         String sqlCount = """ 
                     SELECT
                         task_id AS topic,
@@ -88,7 +88,7 @@ public class CoreUtils {
              Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
              PreparedStatement pstmt = conn.prepareStatement(sqlCount)
         ) {
-            pstmt.setString(1, userId);
+            pstmt.setLong(1, userId);
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
@@ -122,7 +122,7 @@ public class CoreUtils {
         }
         io.print("==============================\n");
     }
-    public static void processTasks(InOut io, Map<String, String> tasksMap,String taskType,String mapName){
+    public static void processTasks(InOut io,long userId, Map<String, String> tasksMap,String taskType,String mapName){
         int score=0;
         int total=tasksMap.size();
 
@@ -148,7 +148,7 @@ public class CoreUtils {
             else {
                 uniqueTaskId = taskType + "_" + key;
             }
-            CoreUtils.logAnswer("test_user",uniqueTaskId,isCorrect,io);
+            logAnswer(userId,uniqueTaskId,isCorrect,io);
         }
         printResult(score,total,io);
     }
