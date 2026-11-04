@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
     private final String BOT_TOKEN;
+
     private final TelegramClient telegramClient;
     private final Map<Long, TelegramInOut> activeDialogs = new ConcurrentHashMap<>();
     private final ExecutorService taskExecutor = Executors.newCachedThreadPool();

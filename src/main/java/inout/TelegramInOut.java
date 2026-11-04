@@ -16,7 +16,7 @@ public class TelegramInOut implements InOut {
     }
     @Override
     public void print(String message) {
-        SendMessage sendMessage = new SendMessage();
+        SendMessage sendMessage = new SendMessage(chatId.toString(), message);
         sendMessage.setChatId(chatId.toString());
         sendMessage.setText(message);
         try {
