@@ -1,7 +1,8 @@
 import main.java.bot.*;
+
 public class Main {
     public static void main(String[] args) {
-        String envProxyHost = System.getenv("PROXY_HOST");
+       /* String envProxyHost = System.getenv("PROXY_HOST");
         String envProxyPort = System.getenv("PROXY_PORT");
 
         if (envProxyHost != null && !envProxyHost.isEmpty()) {
@@ -17,9 +18,9 @@ public class Main {
         if (botToken == null || botToken.isEmpty()) {
             System.out.println("Ошибка: не задан TELEGRAM_BOT_TOKEN!");
             return;
-        }
+        }*/
 
-        TelegramBot bot = new TelegramBot(botToken);
+        Bot bot = new ConsoleBot();
         bot.run();
     }
 }

@@ -59,7 +59,7 @@ public class ConsoleBot implements Bot {
                     new RuleTask().start(io,1L);
                     break;
                 case "4":
-                    new WordGuessTask().start(io, 0);
+                    new WordGuessTask().start(io, 1L);
                     break;
                 case "0":
                     CoreUtils.printAllTimeStats(1L,io);
