@@ -82,6 +82,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             case "/vocabulary":
                 startDialog(chatId, (TelegramInOut) io, new VocabularyTask());
                 break;
+            case "/guess":
+                startDialog(chatId, (TelegramInOut) io, new WordGuessTask());
+                break;
 
             default:
                 sendMessage(chatId, "Неизвестная команда. Введите /start");
