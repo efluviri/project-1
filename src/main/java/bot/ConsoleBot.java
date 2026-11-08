@@ -34,11 +34,6 @@ public class ConsoleBot implements Bot {
         }, 60000, 60000);
 
         while (true) {
-            String command = io.readline();
-            if ("exit".equalsIgnoreCase(command)) {
-                break;
-            }
-            InTask = true;
             io.print("[1] Заполнение пропущенных слов в предложении");
             io.print("[2] Проверка знания слов по темам");
             io.print("[3] Уроки по темам (правило и отработка)");
@@ -46,6 +41,11 @@ public class ConsoleBot implements Bot {
             io.print("[0] узнать статистику за всё время");
             io.print("[0.1] узнать статистику по темам");
 
+            String command = io.readline();
+            if ("exit".equalsIgnoreCase(command)) {
+                break;
+            }
+            InTask = true;
             switch (command) {
                 case "1":
                     new FillBlankTask().start(io,1L);
@@ -74,7 +74,6 @@ public class ConsoleBot implements Bot {
             }
             InTask = false;
             io.print("> ");
-
         }
     }
 }
