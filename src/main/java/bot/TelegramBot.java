@@ -1,4 +1,5 @@
 package main.java.bot;
+
 import java.util.Map;
 import main.java.inout.*;
 import main.java.Tasks.*;
@@ -11,19 +12,34 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
-    private final String BOT_TOKEN;
 
+    private String BOT_TOKEN;
     private final TelegramClient telegramClient;
     private final Map<Long, TelegramInOut> activeDialogs = new ConcurrentHashMap<>();
     private final ExecutorService taskExecutor = Executors.newCachedThreadPool();
 
-    public TelegramBot(String token) {
-        this.BOT_TOKEN = token;
+    public TelegramBot() {
+        String envProxyHost = System.getenv("PROXY_HOST");
+        String envProxyPort = System.getenv("PROXY_PORT");
+
+        if (envProxyHost != null && !envProxyHost.isEmpty()) {
+            System.setProperty("socksProxyHost", envProxyHost);
+            System.out.println("Прокси хост установлен");
+        }
+        if (envProxyPort != null && !envProxyPort.isEmpty()) {
+            System.setProperty("socksProxyPort", envProxyPort);
+            System.out.println("Прокси порт установлен");
+        }
+
+        this.BOT_TOKEN = System.getenv("TELEGRAM_BOT_TOKEN");
+        if (this.BOT_TOKEN == null || this.BOT_TOKEN.isEmpty()) {
+            throw new IllegalArgumentException("Ошибка: не задан TELEGRAM_BOT_TOKEN!");
+        }
+
         this.telegramClient = new OkHttpTelegramClient(BOT_TOKEN);
     }
 
@@ -39,6 +55,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             e.printStackTrace();
         }
     }
+
     private void sendMessage(long chatId, String text) {
         SendMessage message = new SendMessage(String.valueOf(chatId), text);
         try {
@@ -55,6 +72,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
         }
         long chatId = update.getMessage().getChatId();
         String messageText = update.getMessage().getText();
+
         if (activeDialogs.containsKey(chatId)) {
             InOut currentIo = activeDialogs.get(chatId);
             if (currentIo instanceof TelegramInOut) {
@@ -62,6 +80,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             }
             return;
         }
+
         InOut io = new TelegramInOut(chatId, telegramClient);
         switch (messageText.toLowerCase()) {
             case "/start":
@@ -85,17 +104,17 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             case "/guess":
                 startDialog(chatId, (TelegramInOut) io, new WordGuessTask());
                 break;
-
             default:
                 sendMessage(chatId, "Неизвестная команда. Введите /start");
                 break;
         }
     }
-    private void  startDialog(long chatId, TelegramInOut io, Task task) {
+
+    private void startDialog(long chatId, TelegramInOut io, Task task) {
         activeDialogs.put(chatId, io);
         taskExecutor.submit(() -> {
             try {
-                task.start(io,chatId);
+                task.start(io, chatId);
             } finally {
                 activeDialogs.remove(chatId);
             }
