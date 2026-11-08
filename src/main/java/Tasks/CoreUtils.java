@@ -1,11 +1,11 @@
 package main.java.Tasks;
 import main.java.inout.InOut;
-
 import java.util.Map;
 import java.sql.*;
 public class CoreUtils {
     public static final String DB_PATH = "data/statistics.db";
     public static void initDatabase(InOut io)throws SQLException {
+
         try (
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
                 Statement stmt = conn.createStatement()
@@ -19,6 +19,7 @@ public class CoreUtils {
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                     );
                     """;
+
             stmt.execute(sql);
             io.print(" Структура базы данных создана.");
         }

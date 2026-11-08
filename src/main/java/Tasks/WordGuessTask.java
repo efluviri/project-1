@@ -14,36 +14,49 @@ public class WordGuessTask implements Task {
     @Override
     public void start(InOut io, long chatId) {
         io.print("\n=== ИГРА: УГАДАЙ СЛОВО ===");
+
         io.print("Выбери уровень сложности:");
-        io.print("[1] Легкий");
-        io.print("[2] Средний");
-        io.print("[3] Сложный");
+        io.print("[1] Легкий (3 жизни, 60 сек.)");
+        io.print("[2] Средний (2 жизни, 45 сек.)");
+        io.print("[3] Сложный (1 жизнь, 30 сек.)");
 
         String choice = io.readline().trim();
         Map<String, String> selectedMap;
+        int level;
 
         switch (choice) {
             case "1":
                 selectedMap = EASY_WORDS;
+                level=1;
                 break;
             case "2":
                 selectedMap = MEDIUM_WORDS;
+                level=2;
                 break;
             case "3":
                 selectedMap = HARD_WORDS;
+                level=3;
                 break;
             default:
                 io.print("Неверный выбор.");
                 return;
         }
 
-        Game(io, chatId, selectedMap);
+        Game(io, chatId, selectedMap,level);
     }
 
-    private void Game(InOut io, long chatId, Map<String, String> wordsMap) {
+    private void Game(InOut io, long chatId, Map<String, String> wordsMap,int level) {
+        int currentLife = switch(level) {
+            case 1 -> 3;
+            case 2 -> 2;
+            default -> 1;
+        };
+        int skipTokens = 2;
+        int helpTokens = 3;
         Random random = new Random();
         int score = 0;
         int totalQuestions = 10;
+        Map<String, Boolean> usedHelps = new HashMap<>();
 
         io.print("\nУгадай слово по описанию! (10 вопросов)\n");
 
@@ -51,32 +64,100 @@ public class WordGuessTask implements Task {
         boolean[] used = new boolean[descriptions.length];
 
         for (int i = 0; i < totalQuestions; i++) {
+            if (currentLife <= 0 || skipTokens < 0) break;
             int randomIndex;
             do {
                 randomIndex = random.nextInt(descriptions.length);
             } while (used[randomIndex]);
-
             used[randomIndex] = true;
+
             String currentDescription = (String) descriptions[randomIndex];
             String correctAnswer = wordsMap.get(currentDescription);
 
-            io.print("Вопрос " + (i + 1) + "/" + totalQuestions);
-            io.print(currentDescription);
-            io.print("Твой ответ: ");
+            boolean questionAnswered = false;
+            while (!questionAnswered) {
 
-            String userAnswer = io.readline().trim();
-            if (userAnswer.equalsIgnoreCase(correctAnswer)) {
-                io.print("Верно! ");
-                score++;
-                CoreUtils.logAnswer(chatId, "guess_word", true, io);
-            } else {
-                io.print("Неверно.  Правильный ответ: " + correctAnswer);
-                CoreUtils.logAnswer(chatId, "guess_word", false, io);
+                io.print("\nТвои жизни "+ currentLife );
+                io.print("Осталось пропусков: " + skipTokens + " | Осталось подсказок: "+ helpTokens);
+                io.print("Вопрос " + (i + 1) + "/" + totalQuestions);
+                io.print(currentDescription);
+                io.print("Твой ответ: ");
+
+                long startTime = System.currentTimeMillis();
+                String userInput = io.readline();
+                long spentTime = System.currentTimeMillis() - startTime;
+
+                double timeLimit;
+                if (level == 1) timeLimit = 60000;
+                else if (level == 2) timeLimit = 45000;
+                else timeLimit = 30000;
+
+                if (spentTime >= timeLimit) {
+                    io.print("\n Время вышло!");
+                    io.print("Правильный ответ: " + correctAnswer);
+                    currentLife--;
+                    break;
+                }
+
+                String userAnswer = userInput.trim().toLowerCase();
+
+                if ("/skip".equals(userAnswer)) {
+                    if (handleSkip(io, skipTokens)) skipTokens--;
+                    else currentLife--;
+                    questionAnswered = true;
+                    continue;
+                }
+                if ("/help".equals(userAnswer)) {
+                    if (usedHelps.containsKey(currentDescription)) {
+                        io.print("Подсказка по этому слову уже использована.");
+                        continue;
+                    }
+                    if (giveHelp(correctAnswer, helpTokens, io)) {
+                        helpTokens--;
+                        usedHelps.put(currentDescription, true);
+                    }
+                    continue;
+                }
+
+                if (userAnswer.equalsIgnoreCase(correctAnswer)) {
+                    io.print("Верно! ");
+                    score++;
+                    CoreUtils.logAnswer(chatId, "guess_word", true, io);
+                    questionAnswered = true;
+                } else {
+                    io.print("Неверно. Правильный ответ: " + correctAnswer + ". Оставшиеся жизни: " + currentLife);
+                    CoreUtils.logAnswer(chatId, "guess_word", false, io);
+                    currentLife--;
+                    if (currentLife <= 0) { questionAnswered = true; }
+                }
+                io.print("");
             }
-            io.print("");
         }
-
         io.print("Игра окончена! Твой результат: " + score + " из " + totalQuestions);
+    }
+    private boolean handleSkip(InOut io, int skips) {
+        if (skips > 0) {
+            io.print("Ты пропустил слово.");
+            return true;
+        }
+        else {
+            io.print("У тебя закончились пропуска!");
+            return false;
+        }
+    }
+    private boolean giveHelp(String answer, int helpTokens, InOut io) {
+        if (helpTokens <= 0) {
+            io.print("У тебя нет доступных подсказок!");
+            return false;
+        }
+        char firstLetter = Character.toUpperCase(answer.charAt(0));
+        int length = answer.length();
+        io.print("\n ПОДСКАЗКА: \n"+
+                "- Первая буква: " + firstLetter +"\n"+
+                "- Количество букв: " + length+"\n"+
+                "  Осталось подсказок: " + (helpTokens-1));
+        return true;
+
     }
 
     private static Map<String, String> createEasyWords() {
