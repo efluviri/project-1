@@ -93,7 +93,7 @@ public class WordGuessTask implements Task {
                 else timeLimit = 30000;
 
                 if (spentTime >= timeLimit) {
-                    io.print("\n⏰ Время вышло!");
+                    io.print("\n Время вышло!");
                     io.print("Правильный ответ: " + correctAnswer);
                     currentLife--;
                     break;
