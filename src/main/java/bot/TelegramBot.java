@@ -41,6 +41,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
         }
 
         this.telegramClient = new OkHttpTelegramClient(BOT_TOKEN);
+        try {
+            CoreUtils.initDatabase(new TelegramInOut(0L, telegramClient)); // 0L - заглушка для чата
+        } catch (Exception e) {
+            System.err.println("Ошибка инициализации базы данных: " + e.getMessage());
+        }
     }
 
     @Override
@@ -65,11 +70,23 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
         }
     }
 
+    private void sendMessageWithPersistentButtons(long chatId, String text, String[] buttonTexts) {
+        SendMessage message = new SendMessage(String.valueOf(chatId), text);
+        message.setReplyMarkup(ButtonUtils.createPersistentKeyboard(buttonTexts));
+        try {
+            telegramClient.execute(message);
+        } catch (TelegramApiException e) {
+            System.err.println("Ошибка отправки кнопок: " + e.getMessage());
+        }
+    }
+
     @Override
+
     public void consume(Update update) {
         if (!update.hasMessage() || !update.getMessage().hasText()) {
             return;
         }
+
         long chatId = update.getMessage().getChatId();
         String messageText = update.getMessage().getText();
 
@@ -82,10 +99,30 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
         }
 
         InOut io = new TelegramInOut(chatId, telegramClient);
+
         switch (messageText.toLowerCase()) {
             case "/start":
-                sendMessage(chatId, "Привет! Добро пожаловать в бота для изучения английского!");
+                sendMessageWithPersistentButtons(chatId,
+                        "Привет! Выбери задание:",
+                        new String[]{"📝 Пропуски", "📖 Правила", "📚 Словарь", "🎮 Игра", "📊 Статистика"}
+                );
                 break;
+            case "📝 пропуски":
+                startDialog(chatId, (TelegramInOut) io, new FillBlankTask());
+                break;
+            case "📖 правила":
+                startDialog(chatId, (TelegramInOut) io, new RuleTask());
+                break;
+            case "📚 словарь":
+                startDialog(chatId, (TelegramInOut) io, new VocabularyTask());
+                break;
+            case "🎮 игра":
+                startDialog(chatId, (TelegramInOut) io, new WordGuessTask());
+                break;
+            case "📊 статистика":
+                CoreUtils.printAllTimeStats(chatId, io);
+                break;
+
             case "/progress":
                 CoreUtils.printProgress(chatId, io);
                 break;
