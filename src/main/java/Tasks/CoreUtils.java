@@ -1,11 +1,5 @@
 package main.java.Tasks;
-<<<<<<< HEAD
-=======
-import main.java.inout.InOut;
-import java.util.List;
-import java.util.ArrayList;
->>>>>>> origin/task-3
-
+import main.java.inout.*;
 import main.java.inout.InOut;
 import java.util.Map;
 import java.sql.*;
@@ -42,7 +36,7 @@ public class CoreUtils {
                         "INSERT INTO user_answers(user_id, task_id, is_correct) VALUES(?, ?, ?)"
                 )
         ) {
-            pstmt.setString(1, Long.toString(userId)); // Записываем как строку
+            pstmt.setString(1, Long.toString(userId));
             pstmt.setString(2, taskId);
             pstmt.setBoolean(3, isCorrect);
             pstmt.executeUpdate();
@@ -53,17 +47,15 @@ public class CoreUtils {
 
     public static void printAllTimeStats(long userId, InOut io) {
         String sqlCount = """ 
-                    SELECT COUNT(*) AS total,
-                     SUM(is_correct) AS correct
-                    FROM user_answers WHERE user_id=?
-                    """;
+                SELECT COUNT(*) AS total,
+                 SUM(is_correct) AS correct
+                FROM user_answers WHERE user_id=?
+                """;
         try (
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
                 PreparedStatement pstmt = conn.prepareStatement(sqlCount)
         ) {
-            // Ищем тоже как строку, чтобы совпадало с записью
             pstmt.setString(1, Long.toString(userId));
-
             ResultSet rs = pstmt.executeQuery();
             if (!rs.next()) {
                 io.print("\nУ тебя пока нет результатов.");
@@ -83,23 +75,7 @@ public class CoreUtils {
             io.print(" Не удалось получить статистику: " + e.getMessage());
         }
     }
-<<<<<<< HEAD
 
-    public static void printProgress(long userId, InOut io) {
-        String sqlCount = """ 
-                    SELECT
-                        task_id AS topic,
-                        COUNT(*) AS total_attempts,
-                        SUM(is_correct) AS correct_answers
-                    FROM user_answers
-                    WHERE user_id=?
-                    GROUP BY topic
-                    ORDER BY topic ASC;
-                    """;
-        try (
-                Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
-                PreparedStatement pstmt = conn.prepareStatement(sqlCount)
-=======
     public static void printProgress(long userId, InOut io) {
         String sql = """ 
                 SELECT
@@ -116,13 +92,10 @@ public class CoreUtils {
                 ORDER BY topic_group ASC;
                 """;
         try (
-             Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
-             PreparedStatement pstmt = conn.prepareStatement(sql)
->>>>>>> origin/task-3
+                Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
+                PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
-            // Ищем тоже как строку
             pstmt.setString(1, Long.toString(userId));
-
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
@@ -138,11 +111,7 @@ public class CoreUtils {
                 io.print(String.format("%-20s | %.2f%%%n", topic, accuracy * 100));
             } while (rs.next());
         } catch (SQLException e) {
-<<<<<<< HEAD
             io.print(" Не удалось получить статистику: " + e.getMessage());
-=======
-            io.print(" ОШИБКА: Не удалось получить статистику:");
->>>>>>> origin/task-3
         }
     }
 
@@ -159,17 +128,14 @@ public class CoreUtils {
             io.print("Нужно повторить.");
         }
         io.print("==============================\n");
+        if (io instanceof TelegramInOut) {
+            ((TelegramInOut) io).sendBuffer();
+        }
     }
 
-<<<<<<< HEAD
     public static void processTasks(InOut io, long userId, Map<String, String> tasksMap, String taskType, String mapName) {
         int score = 0;
         int total = tasksMap.size();
-=======
-    public static void processTasks(InOut io,long userId, Map<String, String> tasksMap,String taskType,String mapName){
-        int score=0;
-        int total=tasksMap.size();
->>>>>>> origin/task-3
 
         for (Map.Entry<String, String> entry : tasksMap.entrySet()) {
             String taskSentence = entry.getKey();
@@ -195,9 +161,4 @@ public class CoreUtils {
         }
         printResult(score, total, io);
     }
-<<<<<<< HEAD
 }
-=======
-
-}
->>>>>>> origin/task-3

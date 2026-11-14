@@ -85,6 +85,11 @@ public class WordGuessTask implements Task {
 
                 long startTime = System.currentTimeMillis();
                 String userInput = io.readline();
+
+                if (userInput == null) {
+                    io.print("Ошибка получения ответа. Игра прервана.");
+                    return;
+                }
                 long spentTime = System.currentTimeMillis() - startTime;
 
                 double timeLimit;
@@ -124,11 +129,11 @@ public class WordGuessTask implements Task {
                     score++;
                     CoreUtils.logAnswer(chatId, "guess_word", true, io);
                     questionAnswered = true;
-                } else {
+                }  else {
                     io.print("Неверно. Правильный ответ: " + correctAnswer + ". Оставшиеся жизни: " + currentLife);
                     CoreUtils.logAnswer(chatId, "guess_word", false, io);
                     currentLife--;
-                    if (currentLife <= 0) { questionAnswered = true; }
+                    questionAnswered = true;
                 }
                 io.print("");
             }
