@@ -1,6 +1,6 @@
 package main.java.Tasks;
-import java.util.Scanner;
+import main.java.inout.InOut;
 
 public interface Task {
-    void start(Scanner scanner);
+    void start(InOut io,long chatId);
 }
