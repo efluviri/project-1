@@ -75,20 +75,24 @@ public class CoreUtils {
             io.print(" Не удалось получить статистику:");
         }
     }
-    public static void printProgress(long userId,InOut io){
-        String sqlCount = """ 
-                    SELECT
-                        task_id AS topic,
-                        COUNT(*) AS total_attempts,
-                        SUM(is_correct) AS correct_answers
-                    FROM user_answers
-                    WHERE user_id=?
-                    GROUP BY topic
-                    ORDER BY topic ASC;
-                    """;
+    public static void printProgress(long userId, InOut io) {
+        String sql = """ 
+                SELECT
+                     CASE
+                       WHEN INSTR(task_id, '_') > 0
+                       THEN SUBSTR(task_id, 1, INSTR(task_id, '_') - 1)
+                       ELSE task_id
+                     END AS topic_group,
+                     COUNT(*) AS total_attempts,
+                     SUM(is_correct) AS correct_answers
+                FROM user_answers
+                WHERE user_id = ?
+                GROUP BY topic_group
+                ORDER BY topic_group ASC;
+                """;
         try (
              Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
-             PreparedStatement pstmt = conn.prepareStatement(sqlCount)
+             PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
             pstmt.setLong(1, userId);
             ResultSet rs = pstmt.executeQuery();
@@ -97,15 +101,16 @@ public class CoreUtils {
                 io.print("\nУ тебя пока нет результатов.");
                 return;
             }
+            io.print("\n ТВОЙ ПРОГРЕСС ПО ЗАДАНИЯМ ");
             do {
-                String topic = rs.getString("topic");
+                String topic = rs.getString("topic_group");
                 int total = rs.getInt("total_attempts");
                 int correct = rs.getInt("correct_answers");
                 double accuracy = (double) correct / total;
                 io.print(String.format("%-20s | %.2f%%%n", topic, accuracy * 100));
             } while (rs.next());
         } catch (SQLException e) {
-            io.print(" Не удалось получить статистику:");
+            io.print(" ОШИБКА: Не удалось получить статистику:");
         }
     }
     public static void printResult(int score, int total,InOut io) {
