@@ -1,6 +1,7 @@
 import main.java.bot.*;
 public class Main {
     public static void main(String[] args) {
+<<<<<<< Updated upstream
         String envProxyHost = System.getenv("PROXY_HOST");
         String envProxyPort = System.getenv("PROXY_PORT");
 
@@ -20,6 +21,9 @@ public class Main {
         }
 
         TelegramBot bot = new TelegramBot(botToken);
+=======
+        Bot bot = new ConsoleBot();
+>>>>>>> Stashed changes
         bot.run();
     }
 }
