@@ -1,4 +1,10 @@
 package main.java.Tasks;
+<<<<<<< HEAD
+=======
+import main.java.inout.InOut;
+import java.util.List;
+import java.util.ArrayList;
+>>>>>>> origin/task-3
 
 import main.java.inout.InOut;
 import java.util.Map;
@@ -77,6 +83,7 @@ public class CoreUtils {
             io.print(" Не удалось получить статистику: " + e.getMessage());
         }
     }
+<<<<<<< HEAD
 
     public static void printProgress(long userId, InOut io) {
         String sqlCount = """ 
@@ -92,6 +99,26 @@ public class CoreUtils {
         try (
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
                 PreparedStatement pstmt = conn.prepareStatement(sqlCount)
+=======
+    public static void printProgress(long userId, InOut io) {
+        String sql = """ 
+                SELECT
+                     CASE
+                       WHEN INSTR(task_id, '_') > 0
+                       THEN SUBSTR(task_id, 1, INSTR(task_id, '_') - 1)
+                       ELSE task_id
+                     END AS topic_group,
+                     COUNT(*) AS total_attempts,
+                     SUM(is_correct) AS correct_answers
+                FROM user_answers
+                WHERE user_id = ?
+                GROUP BY topic_group
+                ORDER BY topic_group ASC;
+                """;
+        try (
+             Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
+             PreparedStatement pstmt = conn.prepareStatement(sql)
+>>>>>>> origin/task-3
         ) {
             // Ищем тоже как строку
             pstmt.setString(1, Long.toString(userId));
@@ -102,15 +129,20 @@ public class CoreUtils {
                 io.print("\nУ тебя пока нет результатов.");
                 return;
             }
+            io.print("\n ТВОЙ ПРОГРЕСС ПО ЗАДАНИЯМ ");
             do {
-                String topic = rs.getString("topic");
+                String topic = rs.getString("topic_group");
                 int total = rs.getInt("total_attempts");
                 int correct = rs.getInt("correct_answers");
                 double accuracy = (double) correct / total;
                 io.print(String.format("%-20s | %.2f%%%n", topic, accuracy * 100));
             } while (rs.next());
         } catch (SQLException e) {
+<<<<<<< HEAD
             io.print(" Не удалось получить статистику: " + e.getMessage());
+=======
+            io.print(" ОШИБКА: Не удалось получить статистику:");
+>>>>>>> origin/task-3
         }
     }
 
@@ -129,9 +161,15 @@ public class CoreUtils {
         io.print("==============================\n");
     }
 
+<<<<<<< HEAD
     public static void processTasks(InOut io, long userId, Map<String, String> tasksMap, String taskType, String mapName) {
         int score = 0;
         int total = tasksMap.size();
+=======
+    public static void processTasks(InOut io,long userId, Map<String, String> tasksMap,String taskType,String mapName){
+        int score=0;
+        int total=tasksMap.size();
+>>>>>>> origin/task-3
 
         for (Map.Entry<String, String> entry : tasksMap.entrySet()) {
             String taskSentence = entry.getKey();
@@ -157,4 +195,9 @@ public class CoreUtils {
         }
         printResult(score, total, io);
     }
+<<<<<<< HEAD
 }
+=======
+
+}
+>>>>>>> origin/task-3

@@ -1,5 +1,5 @@
 package main.java.bot;
-
+import java.util.List;
 import java.util.Map;
 import main.java.inout.*;
 import main.java.Tasks.*;
@@ -12,6 +12,7 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
+
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -41,11 +42,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
         }
 
         this.telegramClient = new OkHttpTelegramClient(BOT_TOKEN);
-        try {
-            CoreUtils.initDatabase(new TelegramInOut(0L, telegramClient)); // 0L - заглушка для чата
-        } catch (Exception e) {
-            System.err.println("Ошибка инициализации базы данных: " + e.getMessage());
-        }
+
     }
 
     @Override
@@ -59,6 +56,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             System.err.println("Ошибка при запуске бота:");
             e.printStackTrace();
         }
+
     }
 
     private void sendMessage(long chatId, String text) {
@@ -70,23 +68,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
         }
     }
 
-    private void sendMessageWithPersistentButtons(long chatId, String text, String[] buttonTexts) {
-        SendMessage message = new SendMessage(String.valueOf(chatId), text);
-        message.setReplyMarkup(ButtonUtils.createPersistentKeyboard(buttonTexts));
-        try {
-            telegramClient.execute(message);
-        } catch (TelegramApiException e) {
-            System.err.println("Ошибка отправки кнопок: " + e.getMessage());
-        }
-    }
-
     @Override
-
     public void consume(Update update) {
         if (!update.hasMessage() || !update.getMessage().hasText()) {
             return;
         }
-
         long chatId = update.getMessage().getChatId();
         String messageText = update.getMessage().getText();
 
@@ -97,37 +83,18 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             }
             return;
         }
-
         InOut io = new TelegramInOut(chatId, telegramClient);
-
         switch (messageText.toLowerCase()) {
             case "/start":
-                sendMessageWithPersistentButtons(chatId,
-                        "Привет! Выбери задание:",
-                        new String[]{"📝 Пропуски", "📖 Правила", "📚 Словарь", "🎮 Игра", "📊 Статистика"}
-                );
+                sendMessage(chatId, "Привет! Добро пожаловать в бота для изучения английского!");
                 break;
-            case "📝 пропуски":
-                startDialog(chatId, (TelegramInOut) io, new FillBlankTask());
-                break;
-            case "📖 правила":
-                startDialog(chatId, (TelegramInOut) io, new RuleTask());
-                break;
-            case "📚 словарь":
-                startDialog(chatId, (TelegramInOut) io, new VocabularyTask());
-                break;
-            case "🎮 игра":
-                startDialog(chatId, (TelegramInOut) io, new WordGuessTask());
-                break;
-            case "📊 статистика":
-                CoreUtils.printAllTimeStats(chatId, io);
-                break;
-
             case "/progress":
                 CoreUtils.printProgress(chatId, io);
+                io.sendBuffer();
                 break;
             case "/alltime":
                 CoreUtils.printAllTimeStats(chatId, io);
+                io.sendBuffer();
                 break;
             case "/fillblank":
                 startDialog(chatId, (TelegramInOut) io, new FillBlankTask());
@@ -139,7 +106,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
                 startDialog(chatId, (TelegramInOut) io, new VocabularyTask());
                 break;
             case "/guess":
-                startDialog(chatId, (TelegramInOut) io, new WordGuessTask());
+               startDialog(chatId, (TelegramInOut) io, new WordGuessTask());
                 break;
             default:
                 sendMessage(chatId, "Неизвестная команда. Введите /start");
