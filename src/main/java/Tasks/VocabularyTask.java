@@ -30,6 +30,7 @@ public class VocabularyTask implements Task {
         }
         if (vocabulary.isEmpty()) return;
         CoreUtils.processTasks(io,chatId,vocabulary,"vocabulary",mapName);
+        io.sendBuffer();
     }
     private void printTopicMenu(InOut io) {
         io.print("Выберите тему:");

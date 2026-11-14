@@ -19,7 +19,7 @@ public class Main {
             return;
         }
 
-        TelegramBot bot = new TelegramBot(botToken);
+        TelegramBot bot = new TelegramBot();
         bot.run();
     }
 }

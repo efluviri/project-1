@@ -1,5 +1,7 @@
 package main.java.Tasks;
 import main.java.inout.InOut;
+import java.util.List;
+import java.util.ArrayList;
 
 import java.util.Map;
 import java.sql.*;
@@ -122,6 +124,7 @@ public class CoreUtils {
         }
         io.print("==============================\n");
     }
+
     public static void processTasks(InOut io,long userId, Map<String, String> tasksMap,String taskType,String mapName){
         int score=0;
         int total=tasksMap.size();
@@ -152,4 +155,5 @@ public class CoreUtils {
         }
         printResult(score,total,io);
     }
+
 }

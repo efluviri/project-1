@@ -12,6 +12,7 @@ public class FillBlankTask implements Task {
         io.print("\n=== ЗАДАНИЕ: ЗАПОЛНИ ПРОПУСК ===");
         io.print("Вставь пропущенное слово:");
         CoreUtils.processTasks(io,chatId,SENTENCES,"fillblank","");
+        io.sendBuffer();
     }
     private static Map<String, String> createDatabase() {
         Map<String, String> db = new HashMap<>();

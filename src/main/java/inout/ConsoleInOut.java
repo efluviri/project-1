@@ -10,4 +10,8 @@ public class ConsoleInOut implements InOut {
     public String readline(){
         return scanner.nextLine().trim();
     }
+    @Override
+    public void sendBuffer() {
+
+    }
 }

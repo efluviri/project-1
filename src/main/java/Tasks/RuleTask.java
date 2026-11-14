@@ -50,6 +50,7 @@ public class RuleTask implements Task {
         io.print(rule);
         io.print("\n[ОТРАБОТКА]");
         CoreUtils.processTasks(io,chatId,tasks,taskType,mapName);
+        io.sendBuffer();
     }
 
     public String getFutureRule() {
