@@ -1,5 +1,5 @@
 package main.java.bot;
-import java.util.List;
+
 import java.util.Map;
 import main.java.inout.*;
 import main.java.Tasks.*;
@@ -41,7 +41,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
         }
 
         this.telegramClient = new OkHttpTelegramClient(BOT_TOKEN);
-
+        try {
+            CoreUtils.initDatabase(new TelegramInOut(0L, telegramClient));
+        } catch (Exception e) {
+            System.err.println("Ошибка инициализации БД: " + e.getMessage());
+        }
     }
 
     @Override
@@ -55,7 +59,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             System.err.println("Ошибка при запуске бота:");
             e.printStackTrace();
         }
-
     }
 
     private void sendMessage(long chatId, String text) {
@@ -64,6 +67,16 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             telegramClient.execute(message);
         } catch (TelegramApiException e) {
             System.err.println("Ошибка отправки: " + e.getMessage());
+        }
+    }
+
+    private void sendMessageWithPersistentButtons(long chatId, String text, String[] buttonTexts) {
+        SendMessage message = new SendMessage(String.valueOf(chatId), text);
+        message.setReplyMarkup(ButtonUtils.createPersistentKeyboard(buttonTexts));
+        try {
+            telegramClient.execute(message);
+        } catch (TelegramApiException e) {
+            System.err.println("Ошибка отправки кнопок: " + e.getMessage());
         }
     }
 
@@ -82,31 +95,41 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             }
             return;
         }
+
         InOut io = new TelegramInOut(chatId, telegramClient);
+
         switch (messageText.toLowerCase()) {
             case "/start":
-                sendMessage(chatId, "Привет! Добро пожаловать в бота для изучения английского!");
+                sendMessageWithPersistentButtons(chatId,
+                        "Привет! Выбери задание:",
+                        new String[]{"ЗАПОЛНИ ПРОПУСК", "УРОКИ ПО ТЕМАМ", "ПЕРЕВЕДИ СЛОВО", "ИГРА:УГАДАЙ СЛОВО", "СТАТИСТИКА"}
+                );
                 break;
-            case "/progress":
-                CoreUtils.printProgress(chatId, io);
-                io.sendBuffer();
-                break;
-            case "/alltime":
-                CoreUtils.printAllTimeStats(chatId, io);
-                io.sendBuffer();
-                break;
-            case "/fillblank":
+
+            case "заполни пропуск":
                 startDialog(chatId, (TelegramInOut) io, new FillBlankTask());
                 break;
-            case "/rules":
+            case "уроки по темам":
                 startDialog(chatId, (TelegramInOut) io, new RuleTask());
                 break;
-            case "/vocabulary":
+            case "переведи слово":
                 startDialog(chatId, (TelegramInOut) io, new VocabularyTask());
                 break;
-            //case "/guess":
-             //   startDialog(chatId, (TelegramInOut) io, new WordGuessTask());
-             //   break;
+            case "игра:угадай слово":
+                startDialog(chatId, (TelegramInOut) io, new WordGuessTask());
+                break;
+            case "статистика":
+                CoreUtils.printAllTimeStats(chatId, io);
+                if (io instanceof TelegramInOut) {
+                    ((TelegramInOut) io).sendBuffer();
+                }
+                break;
+
+            case "/progress":
+                CoreUtils.printProgress(chatId, io);
+                break;
+
+
             default:
                 sendMessage(chatId, "Неизвестная команда. Введите /start");
                 break;

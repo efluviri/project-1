@@ -1,13 +1,13 @@
 package main.java.Tasks;
+import main.java.inout.*;
 import main.java.inout.InOut;
-import java.util.List;
-import java.util.ArrayList;
-
 import java.util.Map;
 import java.sql.*;
+
 public class CoreUtils {
     public static final String DB_PATH = "data/statistics.db";
-    public static void initDatabase(InOut io)throws SQLException {
+
+    public static void initDatabase(InOut io) throws SQLException {
         try (
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
                 Statement stmt = conn.createStatement()
@@ -21,14 +21,15 @@ public class CoreUtils {
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                     );
                     """;
+
             stmt.execute(sql);
             io.print(" Структура базы данных создана.");
-        }
-        catch (SQLException e) {
-            io.print(" Не удалось создать таблицу базы данных:");
+        } catch (SQLException e) {
+            io.print(" Не удалось создать таблицу базы данных: " + e.getMessage());
         }
     }
-    public static void logAnswer(long userId, String taskId, boolean isCorrect,InOut io) {
+
+    public static void logAnswer(long userId, String taskId, boolean isCorrect, InOut io) {
         try (
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
                 PreparedStatement pstmt = conn.prepareStatement(
@@ -40,21 +41,21 @@ public class CoreUtils {
             pstmt.setBoolean(3, isCorrect);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            io.print(" Ошибка записи статистики:");
+            io.print(" Ошибка записи статистики: " + e.getMessage());
         }
     }
-    public static void printAllTimeStats(long userId,InOut io) {
+
+    public static void printAllTimeStats(long userId, InOut io) {
         String sqlCount = """ 
-                    SELECT COUNT(*) AS total,
-                     SUM(is_correct) AS correct
-                    FROM user_answers WHERE user_id=?
-                    """;
+                SELECT COUNT(*) AS total,
+                 SUM(is_correct) AS correct
+                FROM user_answers WHERE user_id=?
+                """;
         try (
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
                 PreparedStatement pstmt = conn.prepareStatement(sqlCount)
-
         ) {
-            pstmt.setLong(1, userId);
+            pstmt.setString(1, Long.toString(userId));
             ResultSet rs = pstmt.executeQuery();
             if (!rs.next()) {
                 io.print("\nУ тебя пока нет результатов.");
@@ -64,17 +65,17 @@ public class CoreUtils {
             int correct = rs.getInt("correct");
             if (total == 0) {
                 io.print("\nТы ещё не ответил ни на один вопрос!");
-            }
-            else {
+            } else {
                 double accuracy = (double) correct / total;
                 io.print("\n=== ТВОЯ СТАТИСТИКА С НАЧАЛА ОБУЧЕНИЯ ===");
                 io.print("\nТы решил " + String.format("%.2f%%", accuracy * 100) + "\n");
-                io.print("Правильные ответы:" + correct + " из "+ total+ "\n");
+                io.print("Правильные ответы: " + correct + " из " + total + "\n");
             }
         } catch (SQLException e) {
-            io.print(" Не удалось получить статистику:");
+            io.print(" Не удалось получить статистику: " + e.getMessage());
         }
     }
+
     public static void printProgress(long userId, InOut io) {
         String sql = """ 
                 SELECT
@@ -91,10 +92,10 @@ public class CoreUtils {
                 ORDER BY topic_group ASC;
                 """;
         try (
-             Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
-             PreparedStatement pstmt = conn.prepareStatement(sql)
+                Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
+                PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
-            pstmt.setLong(1, userId);
+            pstmt.setString(1, Long.toString(userId));
             ResultSet rs = pstmt.executeQuery();
 
             if (!rs.next()) {
@@ -110,41 +111,42 @@ public class CoreUtils {
                 io.print(String.format("%-20s | %.2f%%%n", topic, accuracy * 100));
             } while (rs.next());
         } catch (SQLException e) {
-            io.print(" ОШИБКА: Не удалось получить статистику:");
+            io.print(" Не удалось получить статистику: " + e.getMessage());
         }
     }
-    public static void printResult(int score, int total,InOut io) {
+
+    public static void printResult(int score, int total, InOut io) {
         double percentage = ((double) score / total) * 100;
         io.print("==============================");
         io.print("ТЕСТ ЗАВЕРШЕН");
         io.print("Правильных ответов: " + score + "/" + total);
         if (percentage == 100.0) {
             io.print("Идеально!");
-        }
-        else if (percentage > 70.0) {
+        } else if (percentage > 70.0) {
             io.print("Хорошо!");
-        }
-        else {
+        } else {
             io.print("Нужно повторить.");
         }
         io.print("==============================\n");
+        if (io instanceof TelegramInOut) {
+            ((TelegramInOut) io).sendBuffer();
+        }
     }
 
-    public static void processTasks(InOut io,long userId, Map<String, String> tasksMap,String taskType,String mapName){
-        int score=0;
-        int total=tasksMap.size();
+    public static void processTasks(InOut io, long userId, Map<String, String> tasksMap, String taskType, String mapName) {
+        int score = 0;
+        int total = tasksMap.size();
 
         for (Map.Entry<String, String> entry : tasksMap.entrySet()) {
             String taskSentence = entry.getKey();
             String correctAnswer = entry.getValue();
-            io.print(taskSentence+"\n");
+            io.print(taskSentence + "\n");
             String userInput = io.readline().toLowerCase();
             boolean isCorrect = userInput.equalsIgnoreCase(correctAnswer);
             if (isCorrect) {
                 io.print("Верно! \n");
                 score++;
-            }
-            else {
+            } else {
                 io.print(String.format("Ошибка. Правильный ответ: %s%n", correctAnswer));
             }
             int questionHash = Math.abs(taskSentence.hashCode());
@@ -152,13 +154,11 @@ public class CoreUtils {
             String uniqueTaskId;
             if (!mapName.isEmpty()) {
                 uniqueTaskId = taskType + "_" + mapName + "_" + key;
-            }
-            else {
+            } else {
                 uniqueTaskId = taskType + "_" + key;
             }
-            logAnswer(userId,uniqueTaskId,isCorrect,io);
+            logAnswer(userId, uniqueTaskId, isCorrect, io);
         }
-        printResult(score,total,io);
+        printResult(score, total, io);
     }
-
 }
