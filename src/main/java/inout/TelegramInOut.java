@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -58,23 +57,6 @@ public class TelegramInOut implements InOut {
             sender.execute(msg);
         } catch (TelegramApiException e) {
               e.printStackTrace();
-        }
-    }
-    public void printWithPersistentButtons(String[] buttons) {
-        try {
-            SendMessage msg = new SendMessage(String.valueOf(chatId), "Выбери:");
-            ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup(new ArrayList<>());
-            List<KeyboardRow> rows = new ArrayList<>();
-            KeyboardRow row = new KeyboardRow();
-            for (String btnText : buttons) {
-                row.add(new KeyboardButton(btnText));
-            }
-            rows.add(row);
-            markup.setKeyboard(rows);
-            msg.setReplyMarkup(markup);
-            sender.execute(msg);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
         }
     }
 

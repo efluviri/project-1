@@ -11,14 +11,11 @@ public class ConsoleInOut implements InOut {
         return scanner.nextLine().trim();
     }
     public void sendBuffer() {}
-    public void printWithPersistentButtons(String[] buttons) {
+    public void printWithInlineButtons(String text, String[] buttons, String[] callbacks) {
+        print(text);
         print("\n ВЫБЕРИ ВАРИАНТ ");
         for (int i = 0; i < buttons.length; i++) {
             print("[" + (i + 1) + "] " + buttons[i]);
         }
-    }
-    public void printWithInlineButtons(String text, String[] buttons, String[] callbacks) {
-        print(text);
-        printWithPersistentButtons(buttons);
     }
 }
