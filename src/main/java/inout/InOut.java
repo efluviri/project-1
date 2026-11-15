@@ -3,6 +3,7 @@ package main.java.inout;
 public interface InOut {
     public void print(String message);
     public String readline();
-    void sendBuffer();
-
+    public void sendBuffer();
+    public void printWithPersistentButtons(String[] buttons);
+    public void printWithInlineButtons(String text, String[] buttons, String[] callbacks);
 }

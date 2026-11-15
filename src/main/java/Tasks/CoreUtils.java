@@ -67,7 +67,7 @@ public class CoreUtils {
                 io.print("\nТы ещё не ответил ни на один вопрос!");
             } else {
                 double accuracy = (double) correct / total;
-                io.print("\n=== ТВОЯ СТАТИСТИКА С НАЧАЛА ОБУЧЕНИЯ ===");
+                io.print("\n ТВОЯ СТАТИСТИКА С НАЧАЛА ОБУЧЕНИЯ ");
                 io.print("\nТы решил " + String.format("%.2f%%", accuracy * 100) + "\n");
                 io.print("Правильные ответы: " + correct + " из " + total + "\n");
             }
@@ -117,7 +117,6 @@ public class CoreUtils {
 
     public static void printResult(int score, int total, InOut io) {
         double percentage = ((double) score / total) * 100;
-        io.print("==============================");
         io.print("ТЕСТ ЗАВЕРШЕН");
         io.print("Правильных ответов: " + score + "/" + total);
         if (percentage == 100.0) {
@@ -127,7 +126,6 @@ public class CoreUtils {
         } else {
             io.print("Нужно повторить.");
         }
-        io.print("==============================\n");
         if (io instanceof TelegramInOut) {
             ((TelegramInOut) io).sendBuffer();
         }

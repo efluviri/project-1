@@ -1,7 +1,16 @@
 package main.java.inout;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -21,8 +30,6 @@ public class TelegramInOut implements InOut {
     public void print(String message) {
         buffer.append(message).append("\n");
     }
-
-    @Override
     public String readline() {
         sendBuffer();
 
@@ -31,6 +38,43 @@ public class TelegramInOut implements InOut {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return null;
+        }
+    }
+    public void printWithInlineButtons(String text, String[] buttons, String[] callbacks) {
+        try {
+            SendMessage msg = new SendMessage(chatId.toString(), text);
+            InlineKeyboardMarkup markup = new InlineKeyboardMarkup(new ArrayList<>());
+            List<InlineKeyboardRow> rows = new ArrayList<>();
+            for (int i = 0; i < buttons.length; i++) {
+                InlineKeyboardButton button = new InlineKeyboardButton(buttons[i]);
+                button.setCallbackData(callbacks[i]);
+
+                InlineKeyboardRow row = new InlineKeyboardRow();
+                row.add(button);
+                rows.add(row);
+            }
+            markup.setKeyboard(rows);
+            msg.setReplyMarkup(markup);
+            sender.execute(msg);
+        } catch (TelegramApiException e) {
+              e.printStackTrace();
+        }
+    }
+    public void printWithPersistentButtons(String[] buttons) {
+        try {
+            SendMessage msg = new SendMessage(String.valueOf(chatId), "Выбери:");
+            ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup(new ArrayList<>());
+            List<KeyboardRow> rows = new ArrayList<>();
+            KeyboardRow row = new KeyboardRow();
+            for (String btnText : buttons) {
+                row.add(new KeyboardButton(btnText));
+            }
+            rows.add(row);
+            markup.setKeyboard(rows);
+            msg.setReplyMarkup(markup);
+            sender.execute(msg);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 

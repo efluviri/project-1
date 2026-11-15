@@ -1,6 +1,6 @@
 package main.java.Tasks;
 
-import main.java.inout.InOut;
+import main.java.inout.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -13,39 +13,33 @@ public class WordGuessTask implements Task {
 
     @Override
     public void start(InOut io, long chatId) {
-        io.print("\n=== ИГРА: УГАДАЙ СЛОВО ===");
+        io.print("\n ИГРА: УГАДАЙ СЛОВО");
 
-        io.print("Выбери уровень сложности:");
-        io.print("[1] Легкий (3 жизни, 60 сек.)");
-        io.print("[2] Средний (2 жизни, 45 сек.)");
-        io.print("[3] Сложный (1 жизнь, 30 сек.)");
-
-        String choice = io.readline().trim();
+        io.print("Выбери уровень сложности: Легкий (3 жизни, 60 сек.), Средний (2 жизни, 45 сек.), Сложный (1 жизнь, 30 сек.)");
+        String[] levels = {"1. Легкий", "2. Средний", "3. Сложный"};
+        String[] callbacks = {"level_1", "level_2", "level_3"};
+        io.printWithInlineButtons("Выбери уровень:", levels, callbacks);
+    }
+    public void startGame(InOut io,long chatId,int level){
         Map<String, String> selectedMap;
-        int level;
 
-        switch (choice) {
-            case "1":
+        switch (level) {
+            case 1:
                 selectedMap = EASY_WORDS;
-                level=1;
                 break;
-            case "2":
+            case 2:
                 selectedMap = MEDIUM_WORDS;
-                level=2;
                 break;
-            case "3":
+            case 3:
                 selectedMap = HARD_WORDS;
-                level=3;
                 break;
             default:
-                io.print("Неверный выбор.");
-                return;
+                selectedMap = EASY_WORDS;
         }
-
-        Game(io, chatId, selectedMap,level);
+        runGame(io, chatId, selectedMap,level);
     }
 
-    private void Game(InOut io, long chatId, Map<String, String> wordsMap,int level) {
+    private void runGame(InOut io, long chatId, Map<String, String> wordsMap,int level) {
         int currentLife = switch(level) {
             case 1 -> 3;
             case 2 -> 2;
@@ -63,8 +57,7 @@ public class WordGuessTask implements Task {
         Object[] descriptions = wordsMap.keySet().toArray();
         boolean[] used = new boolean[descriptions.length];
 
-        for (int i = 0; i < totalQuestions; i++) {
-            if (currentLife <= 0 || skipTokens < 0) break;
+        for (int i = 0; i < totalQuestions && currentLife > 0; i++) {
             int randomIndex;
             do {
                 randomIndex = random.nextInt(descriptions.length);
@@ -81,38 +74,25 @@ public class WordGuessTask implements Task {
                 io.print("Осталось пропусков: " + skipTokens + " | Осталось подсказок: "+ helpTokens);
                 io.print("Вопрос " + (i + 1) + "/" + totalQuestions);
                 io.print(currentDescription);
-                io.print("Твой ответ: ");
 
-                long startTime = System.currentTimeMillis();
+                String[] actionButtons = {" Подсказка", " Пропустить"};
+                String[] actionData = {"HELP", "SKIP"};
+                io.printWithInlineButtons("Твой ответ:", actionButtons, actionData);
                 String userInput = io.readline();
 
                 if (userInput == null) {
                     io.print("Ошибка получения ответа. Игра прервана.");
                     return;
                 }
-                long spentTime = System.currentTimeMillis() - startTime;
-
-                double timeLimit;
-                if (level == 1) timeLimit = 60000;
-                else if (level == 2) timeLimit = 45000;
-                else timeLimit = 30000;
-
-                if (spentTime >= timeLimit) {
-                    io.print("\n Время вышло!");
-                    io.print("Правильный ответ: " + correctAnswer);
-                    currentLife--;
-                    break;
-                }
-
                 String userAnswer = userInput.trim().toLowerCase();
 
-                if ("/skip".equals(userAnswer)) {
+                if ("/skip".equals(userAnswer)|| "SKIP".equalsIgnoreCase(userInput)) {
                     if (handleSkip(io, skipTokens)) skipTokens--;
                     else currentLife--;
                     questionAnswered = true;
                     continue;
                 }
-                if ("/help".equals(userAnswer)) {
+                if ("/help".equals(userAnswer)|| "HELP".equalsIgnoreCase(userInput)) {
                     if (usedHelps.containsKey(currentDescription)) {
                         io.print("Подсказка по этому слову уже использована.");
                         continue;
@@ -128,14 +108,15 @@ public class WordGuessTask implements Task {
                     io.print("Верно! ");
                     score++;
                     CoreUtils.logAnswer(chatId, "guess_word", true, io);
-                    questionAnswered = true;
+
                 }  else {
-                    io.print("Неверно. Правильный ответ: " + correctAnswer + ". Оставшиеся жизни: " + currentLife);
+                    io.print("Неверно. Правильный ответ: " + correctAnswer);
                     CoreUtils.logAnswer(chatId, "guess_word", false, io);
                     currentLife--;
-                    questionAnswered = true;
                 }
+                questionAnswered = true;
                 io.print("");
+
             }
         }
         io.print("Игра окончена! Твой результат: " + score + " из " + totalQuestions);

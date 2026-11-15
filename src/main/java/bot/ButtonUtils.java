@@ -15,7 +15,6 @@ public class ButtonUtils {
             KeyboardButton button = new KeyboardButton(text);
             row.add(button);
         }
-
         rows.add(row);
 
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup(rows);
