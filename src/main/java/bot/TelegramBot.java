@@ -84,21 +84,33 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             String data = update.getCallbackQuery().getData();
             long chatId = update.getCallbackQuery().getMessage().getChatId();
 
-            try { telegramClient.execute(new AnswerCallbackQuery(update.getCallbackQuery().getId())); } catch (TelegramApiException ignored) {}
+            try {
+                telegramClient.execute(new AnswerCallbackQuery(update.getCallbackQuery().getId()));
+            } catch (TelegramApiException ignored) {}
 
             if (data.startsWith("level_")) {
                 int level = Integer.parseInt(data.substring(6));
-                TelegramInOut gameIo = new TelegramInOut(chatId, this.telegramClient);
+                TelegramInOut gameIo = new TelegramInOut(chatId,telegramClient);
                 activeDialogs.put(chatId, gameIo);
 
-                WordGuessTask game = new WordGuessTask();
-                taskExecutor.submit(() -> game.startGame(gameIo, chatId, level));
+                taskExecutor.submit(() -> {
+                    try {
+                        WordGuessTask game = new WordGuessTask();
+                        game.startGame(gameIo, chatId, level);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        gameIo.print("Произошла ошибка во время игры.");
+                        gameIo.sendBuffer();
+                    } finally {
+                        activeDialogs.remove(chatId);
+                    }
+                });
                 return;
             }
             if (activeDialogs.containsKey(chatId)) {
                 InOut currentIo = activeDialogs.get(chatId);
                 if (currentIo instanceof TelegramInOut) {
-                    ((TelegramInOut) currentIo).receiveMessage(data);
+                    ((TelegramInOut) currentIo).receiveCallback(data);
                 }
                 return;
             }
@@ -115,39 +127,36 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             if (currentIo instanceof TelegramInOut) {
                 ((TelegramInOut) currentIo).receiveMessage(messageText);
             }
-            return;
         }
         if (!activeDialogs.containsKey(chatId)) {
             TelegramInOut io = new TelegramInOut(chatId, telegramClient);
             activeDialogs.put(chatId, io);
-            switch (messageText.toLowerCase()) {
+            String normalizedText = messageText.trim().toLowerCase();
+            switch (normalizedText) {
                case "/start":
                   sendMessageWithPersistentButtons(chatId,
                           "Привет! Выбери задание:",
-                          new String[]{"ЗАПОЛНИ ПРОПУСК", "УРОКИ ПО ТЕМАМ", "ПЕРЕВЕДИ СЛОВО", "ИГРА:УГАДАЙ СЛОВО", "СТАТИСТИКА"}
+                          new String[]{"заполни пропуск", "уроки по темам", "переведи слово", "игра:угадай слово", "статистика","прогресс"}
                   );
                   break;
 
                case "заполни пропуск":
-                  startDialog(chatId, (TelegramInOut) io, new FillBlankTask());
+                  startDialog(chatId,  io, new FillBlankTask());
                   break;
                case "уроки по темам":
-                   startDialog(chatId, (TelegramInOut) io, new RuleTask());
+                   startDialog(chatId,  io, new RuleTask());
                    break;
                case "переведи слово":
-                  startDialog(chatId, (TelegramInOut) io, new VocabularyTask());
+                  startDialog(chatId, io, new VocabularyTask());
                     break;
                case "игра:угадай слово":
-                  startDialog(chatId, (TelegramInOut) io, new WordGuessTask());
+                  startDialog(chatId, io, new WordGuessTask());
                   break;
                case "статистика":
                   CoreUtils.printAllTimeStats(chatId, io);
-                  if (io instanceof TelegramInOut) {
-                      ((TelegramInOut) io).sendBuffer();
-                  }
                   break;
 
-               case "/progress":
+               case "прогресс":
                   CoreUtils.printProgress(chatId, io);
                   break;
 

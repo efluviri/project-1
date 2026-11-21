@@ -18,6 +18,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="telegrambots-6.7.0" level="project" />
+    <orderEntry type="library" name="telegram.telegrambots" level="project" />
   </component>
 </module>

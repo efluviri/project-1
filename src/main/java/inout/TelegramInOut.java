@@ -30,13 +30,38 @@ public class TelegramInOut implements InOut {
         buffer.append(message).append("\n");
     }
     public String readline() {
-        sendBuffer();
-
         try {
             return messageQueue.take();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return null;
+        }
+    }
+    public void sendBuffer() {
+        if (buffer.length() > 0) {
+            String text = buffer.toString().trim();
+            SendMessage sendMessage = new SendMessage(chatId.toString(), text);
+            try {
+                sender.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                System.err.println("Не удалось отправить сообщение в чат " + chatId);
+            }
+            buffer.setLength(0);
+        }
+    }
+
+    public void receiveMessage(String text) {
+        try {
+            messageQueue.put(text);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+    public void receiveCallback(String data) {
+        try {
+            messageQueue.put(data);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
     public void printWithInlineButtons(String text, String[] buttons, String[] callbacks) {
@@ -60,24 +85,5 @@ public class TelegramInOut implements InOut {
         }
     }
 
-    public void sendBuffer() {
-        if (buffer.length() > 0) {
-            String text = buffer.toString().trim();
-            SendMessage sendMessage = new SendMessage(chatId.toString(), text);
-            try {
-                sender.execute(sendMessage);
-            } catch (TelegramApiException e) {
-                System.err.println("Не удалось отправить сообщение в чат " + chatId);
-            }
-            buffer.setLength(0);
-        }
-    }
 
-    public void receiveMessage(String text) {
-        try {
-            messageQueue.put(text);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
 }

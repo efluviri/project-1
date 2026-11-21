@@ -40,11 +40,7 @@ public class WordGuessTask implements Task {
     }
 
     private void runGame(InOut io, long chatId, Map<String, String> wordsMap,int level) {
-        int currentLife = switch(level) {
-            case 1 -> 3;
-            case 2 -> 2;
-            default -> 1;
-        };
+        int currentLife = 4-level;
         int skipTokens = 2;
         int helpTokens = 3;
         Random random = new Random();
@@ -68,22 +64,25 @@ public class WordGuessTask implements Task {
             String correctAnswer = wordsMap.get(currentDescription);
 
             boolean questionAnswered = false;
-            while (!questionAnswered) {
+            while (!questionAnswered && currentLife > 0) {
 
                 io.print("\nТвои жизни "+ currentLife );
                 io.print("Осталось пропусков: " + skipTokens + " | Осталось подсказок: "+ helpTokens);
                 io.print("Вопрос " + (i + 1) + "/" + totalQuestions);
                 io.print(currentDescription);
 
+                io.sendBuffer();
                 String[] actionButtons = {" Подсказка", " Пропустить"};
                 String[] actionData = {"HELP", "SKIP"};
                 io.printWithInlineButtons("Твой ответ:", actionButtons, actionData);
-                String userInput = io.readline();
 
+
+                String userInput = io.readline();
                 if (userInput == null) {
                     io.print("Ошибка получения ответа. Игра прервана.");
                     return;
                 }
+
                 String userAnswer = userInput.trim().toLowerCase();
 
                 if ("/skip".equals(userAnswer)|| "SKIP".equalsIgnoreCase(userInput)) {
@@ -120,6 +119,9 @@ public class WordGuessTask implements Task {
             }
         }
         io.print("Игра окончена! Твой результат: " + score + " из " + totalQuestions);
+        io.sendBuffer();
+
+
     }
     private boolean handleSkip(InOut io, int skips) {
         if (skips > 0) {
