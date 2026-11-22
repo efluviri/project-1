@@ -30,6 +30,7 @@ public class TelegramInOut implements InOut {
         buffer.append(message).append("\n");
     }
     public String readline() {
+        sendBuffer();
         try {
             return messageQueue.take();
         } catch (InterruptedException e) {
@@ -65,6 +66,7 @@ public class TelegramInOut implements InOut {
         }
     }
     public void printWithInlineButtons(String text, String[] buttons, String[] callbacks) {
+        sendBuffer();
         try {
             SendMessage msg = new SendMessage(chatId.toString(), text);
             InlineKeyboardMarkup markup = new InlineKeyboardMarkup(new ArrayList<>());

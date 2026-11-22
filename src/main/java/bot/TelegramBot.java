@@ -130,34 +130,41 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
         }
         if (!activeDialogs.containsKey(chatId)) {
             TelegramInOut io = new TelegramInOut(chatId, telegramClient);
-            activeDialogs.put(chatId, io);
             String normalizedText = messageText.trim().toLowerCase();
             switch (normalizedText) {
                case "/start":
                   sendMessageWithPersistentButtons(chatId,
                           "Привет! Выбери задание:",
-                          new String[]{"заполни пропуск", "уроки по темам", "переведи слово", "игра:угадай слово", "статистика","прогресс"}
-                  );
+                          new String[]{"заполни пропуск", "уроки по темам", "переведи слово", "игра:угадай слово", "статистика","прогресс"});
+                   io.sendBuffer();
                   break;
 
                case "заполни пропуск":
                   startDialog(chatId,  io, new FillBlankTask());
+                   io.sendBuffer();
                   break;
                case "уроки по темам":
                    startDialog(chatId,  io, new RuleTask());
+                   io.sendBuffer();
                    break;
                case "переведи слово":
-                  startDialog(chatId, io, new VocabularyTask());
-                    break;
+                   startDialog(chatId, io, new VocabularyTask());
+                   io.sendBuffer();
+                   break;
                case "игра:угадай слово":
                   startDialog(chatId, io, new WordGuessTask());
+                   io.sendBuffer();
                   break;
                case "статистика":
                   CoreUtils.printAllTimeStats(chatId, io);
+                   io.sendBuffer();
+                   activeDialogs.remove(chatId);
                   break;
 
                case "прогресс":
                   CoreUtils.printProgress(chatId, io);
+                   io.sendBuffer();
+                   activeDialogs.remove(chatId);
                   break;
 
 

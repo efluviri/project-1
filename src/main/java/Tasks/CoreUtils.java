@@ -46,6 +46,7 @@ public class CoreUtils {
     }
 
     public static void printAllTimeStats(long userId, InOut io) {
+        System.out.println("DEBUG: Вызван printAllTimeStats для " + userId);
         String sqlCount = """ 
                 SELECT COUNT(*) AS total,
                  SUM(is_correct) AS correct
@@ -72,7 +73,7 @@ public class CoreUtils {
                 io.print("Правильные ответы: " + correct + " из " + total + "\n");
             }
         } catch (SQLException e) {
-            io.print(" Не удалось получить статистику: " + e.getMessage());
+            io.print(" Ошибка получения статистики: " + e.getMessage());
         }
     }
 
@@ -126,9 +127,7 @@ public class CoreUtils {
         } else {
             io.print("Нужно повторить.");
         }
-        if (io instanceof TelegramInOut) {
-            ((TelegramInOut) io).sendBuffer();
-        }
+        io.sendBuffer();
     }
 
     public static void processTasks(InOut io, long userId, Map<String, String> tasksMap, String taskType, String mapName) {
