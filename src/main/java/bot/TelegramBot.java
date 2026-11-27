@@ -88,9 +88,39 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
                 telegramClient.execute(new AnswerCallbackQuery(update.getCallbackQuery().getId()));
             } catch (TelegramApiException ignored) {}
 
+            if (data.startsWith("/")) {
+                TelegramInOut io = new TelegramInOut(chatId, telegramClient);
+                switch (data) {
+                    case "/fillblank":
+                        startDialog(chatId, io, new FillBlankTask());
+                        break;
+                    case "/rules":
+                        startDialog(chatId, io, new RuleTask());
+                        break;
+                    case "/vocabulary":
+                        startDialog(chatId, io, new VocabularyTask());
+                        break;
+                    case "/guess":
+                        startDialog(chatId, io, new WordGuessTask());
+                        break;
+                    case "/stats":
+                        CoreUtils.printAllTimeStats(chatId, io);
+                        io.sendBuffer();
+                        break;
+                    case "/progress":
+                        CoreUtils.printProgress(chatId, io);
+                        io.sendBuffer();
+                        break;
+                    default:
+                        sendMessage(chatId, "Неизвестная команда.");
+                        break;
+                }
+                return;
+            }
+
             if (data.startsWith("level_")) {
                 int level = Integer.parseInt(data.substring(6));
-                TelegramInOut gameIo = new TelegramInOut(chatId,telegramClient);
+                TelegramInOut gameIo = new TelegramInOut(chatId, telegramClient);
                 activeDialogs.put(chatId, gameIo);
 
                 taskExecutor.submit(() -> {
@@ -107,6 +137,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
                 });
                 return;
             }
+
             if (activeDialogs.containsKey(chatId)) {
                 InOut currentIo = activeDialogs.get(chatId);
                 if (currentIo instanceof TelegramInOut) {
@@ -127,47 +158,20 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             if (currentIo instanceof TelegramInOut) {
                 ((TelegramInOut) currentIo).receiveMessage(messageText);
             }
+            return;
         }
         if (!activeDialogs.containsKey(chatId)) {
             TelegramInOut io = new TelegramInOut(chatId, telegramClient);
             String normalizedText = messageText.trim().toLowerCase();
             switch (normalizedText) {
-               case "/start":
-                  sendMessageWithPersistentButtons(chatId,
-                          "Привет! Выбери задание:",
-                          new String[]{"заполни пропуск", "уроки по темам", "переведи слово", "игра:угадай слово", "статистика","прогресс"});
-                   io.sendBuffer();
-                  break;
-
-               case "заполни пропуск":
-                  startDialog(chatId,  io, new FillBlankTask());
-                   io.sendBuffer();
-                  break;
-               case "уроки по темам":
-                   startDialog(chatId,  io, new RuleTask());
-                   io.sendBuffer();
-                   break;
-               case "переведи слово":
-                   startDialog(chatId, io, new VocabularyTask());
-                   io.sendBuffer();
-                   break;
-               case "игра:угадай слово":
-                  startDialog(chatId, io, new WordGuessTask());
-                   io.sendBuffer();
-                  break;
-               case "статистика":
-                  CoreUtils.printAllTimeStats(chatId, io);
-                   io.sendBuffer();
-                   activeDialogs.remove(chatId);
-                  break;
-
-               case "прогресс":
-                  CoreUtils.printProgress(chatId, io);
-                   io.sendBuffer();
-                   activeDialogs.remove(chatId);
-                  break;
-
-
+                case "/start":
+                    TelegramInOut startIo = new TelegramInOut(chatId, telegramClient);
+                    startIo.printWithInlineButtons(
+                            "Привет! Выбери задание:",
+                            new String[]{"Заполнить пропуск", "Уроки по темам", " Переведи слово", "Игра: Угадай слово", "Статистика", "Прогресс"},
+                            new String[]{"/fillblank", "/rules", "/vocabulary", "/guess", "/stats", "/progress"}
+                    );
+                    break;
                default:
                    sendMessage(chatId, "Неизвестная команда. Введите /start");
                    break;

@@ -13,6 +13,11 @@ public class FillBlankTask implements Task {
         io.print("Вставь пропущенное слово:");
         CoreUtils.processTasks(io,chatId,SENTENCES,"fillblank","");
         io.sendBuffer();
+        io.printWithInlineButtons(
+                "Выбери задание:",
+                new String[]{"Заполнить пропуск", "Уроки по темам", "Переведи слово", "Игра: Угадай слово", "Статистика", "Прогресс"},
+                new String[]{"/fillblank", "/rules", "/vocabulary", "/guess", "/stats", "/progress"}
+        );
     }
     private static Map<String, String> createDatabase() {
         Map<String, String> db = new HashMap<>();

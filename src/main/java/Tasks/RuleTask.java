@@ -51,6 +51,11 @@ public class RuleTask implements Task {
         io.print("\n[ОТРАБОТКА]");
         CoreUtils.processTasks(io,chatId,tasks,taskType,mapName);
         io.sendBuffer();
+        io.printWithInlineButtons(
+                "Выбери задание:",
+                new String[]{"Заполнить пропуск", "Уроки по темам", "Переведи слово", "Игра: Угадай слово", "Статистика", "Прогресс"},
+                new String[]{"/fillblank", "/rules", "/vocabulary", "/guess", "/stats", "/progress"}
+        );
     }
 
     public String getFutureRule() {

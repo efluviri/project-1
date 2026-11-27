@@ -31,6 +31,11 @@ public class VocabularyTask implements Task {
         if (vocabulary.isEmpty()) return;
         CoreUtils.processTasks(io,chatId,vocabulary,"vocabulary",mapName);
         io.sendBuffer();
+        io.printWithInlineButtons(
+                "Выбери задание:",
+                new String[]{"Заполнить пропуск", "Уроки по темам", "Переведи слово", "Игра: Угадай слово", "Статистика", "Прогресс"},
+                new String[]{"/fillblank", "/rules", "/vocabulary", "/guess", "/stats", "/progress"}
+        );
     }
     private void printTopicMenu(InOut io) {
         io.print("Выберите тему:");

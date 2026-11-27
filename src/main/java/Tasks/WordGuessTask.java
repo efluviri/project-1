@@ -39,8 +39,16 @@ public class WordGuessTask implements Task {
         runGame(io, chatId, selectedMap,level);
     }
 
-    private void runGame(InOut io, long chatId, Map<String, String> wordsMap,int level) {
-        int currentLife = 4-level;
+    private void runGame(InOut io, long chatId, Map<String, String> wordsMap, int level) {
+        int timeLimit;
+        if (level == 1) {
+            timeLimit = 60000;
+        } else if (level == 2) {
+            timeLimit = 45000;
+        } else {
+            timeLimit = 30000;
+        }
+        int currentLife = 4 - level;
         int skipTokens = 2;
         int helpTokens = 3;
         Random random = new Random();
@@ -66,18 +74,52 @@ public class WordGuessTask implements Task {
             boolean questionAnswered = false;
             while (!questionAnswered && currentLife > 0) {
 
-                io.print("\nТвои жизни "+ currentLife );
-                io.print("Осталось пропусков: " + skipTokens + " | Осталось подсказок: "+ helpTokens);
+                io.print("\nТвои жизни " + currentLife);
+                io.print("Осталось пропусков: " + skipTokens + " | Осталось подсказок: " + helpTokens);
                 io.print("Вопрос " + (i + 1) + "/" + totalQuestions);
                 io.print(currentDescription);
 
                 io.sendBuffer();
                 String[] actionButtons = {" Подсказка", " Пропустить"};
                 String[] actionData = {"HELP", "SKIP"};
-                io.printWithInlineButtons("Твой ответ:", actionButtons, actionData);
+                int messageId = io.printWithInlineButtons("Твой ответ:", actionButtons, actionData);
 
+                boolean[] timeIsOut = {false};
+                final int[] secondsLeft = {timeLimit / 1000};
+
+                java.util.Timer timer = new java.util.Timer();
+                timer.scheduleAtFixedRate(new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        if (secondsLeft[0] > 0) {
+                            if (secondsLeft[0] % 5 == 0) {
+                                ((TelegramInOut) io).editMessage(messageId,
+                                        "Вопрос: " + currentDescription + "\n\nУ тебя осталось " + secondsLeft[0] + " секунд!",
+                                        new String[]{" Подсказка", " Пропустить"},
+                                        new String[]{"HELP", "SKIP"});
+                            }
+                            secondsLeft[0]--;
+                        } else {
+                            timeIsOut[0] = true;
+                            ((TelegramInOut) io).editMessage(messageId,
+                                    " Время вышло! Правильный ответ: " + correctAnswer,
+                                    new String[]{" Подсказка", " Пропустить"},
+                                    new String[]{"HELP", "SKIP"});
+                            timer.cancel();
+                        }
+                    }
+                }, 0, 1000);
 
                 String userInput = io.readline();
+                timer.cancel();
+
+                if (timeIsOut[0]) {
+                    io.print("Время вышло! Ты не успел ответить.");
+                    currentLife--;
+                    questionAnswered = true;
+                    continue;
+                }
+
                 if (userInput == null) {
                     io.print("Ошибка получения ответа. Игра прервана.");
                     return;
@@ -85,13 +127,13 @@ public class WordGuessTask implements Task {
 
                 String userAnswer = userInput.trim().toLowerCase();
 
-                if ("/skip".equals(userAnswer)|| "SKIP".equalsIgnoreCase(userInput)) {
+                if ("/skip".equals(userAnswer) || "SKIP".equalsIgnoreCase(userInput)) {
                     if (handleSkip(io, skipTokens)) skipTokens--;
                     else currentLife--;
                     questionAnswered = true;
                     continue;
                 }
-                if ("/help".equals(userAnswer)|| "HELP".equalsIgnoreCase(userInput)) {
+                if ("/help".equals(userAnswer) || "HELP".equalsIgnoreCase(userInput)) {
                     if (usedHelps.containsKey(currentDescription)) {
                         io.print("Подсказка по этому слову уже использована.");
                         continue;
@@ -107,22 +149,24 @@ public class WordGuessTask implements Task {
                     io.print("Верно! ");
                     score++;
                     CoreUtils.logAnswer(chatId, "guess_word", true, io);
-
-                }  else {
+                } else {
                     io.print("Неверно. Правильный ответ: " + correctAnswer);
                     CoreUtils.logAnswer(chatId, "guess_word", false, io);
                     currentLife--;
                 }
                 questionAnswered = true;
                 io.print("");
-
             }
         }
         io.print("Игра окончена! Твой результат: " + score + " из " + totalQuestions);
         io.sendBuffer();
-
-
+        io.printWithInlineButtons(
+                "Выбери задание:",
+                new String[]{"Заполнить пропуск", "Уроки по темам", "Переведи слово", "Игра: Угадай слово", "Статистика", "Прогресс"},
+                new String[]{"/fillblank", "/rules", "/vocabulary", "/guess", "/stats", "/progress"}
+        );
     }
+
     private boolean handleSkip(InOut io, int skips) {
         if (skips > 0) {
             io.print("Ты пропустил слово.");
