@@ -1,8 +1,10 @@
 package main.java.Tasks;
 
+import main.java.inout.InOut;
+
 public class MessageService {
-    public void printMessage() {
+    public void printMessage(InOut io) {
         String reminderText = "НАПОМИНАНИЕ: не забудь сегодня выучить новые слова!";
-        System.out.println(reminderText);
+        io.print(reminderText);
     }
 }

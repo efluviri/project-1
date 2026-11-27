@@ -16,5 +16,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="telegram.telegrambots.client2" level="project" />
+    <orderEntry type="library" name="telegram.telegrambots.longpolling2" level="project" />
   </component>
 </module>
