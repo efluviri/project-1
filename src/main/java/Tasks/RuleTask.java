@@ -11,48 +11,44 @@ public class RuleTask implements Task {
 
     private String rule;
     private Map<String, String> tasks;
-    private String taskType="rule";
     private String mapName;
 
     @Override
     public void start(InOut io,long chatId) {
-
-        io.print("\n=== ИЗУЧЕНИЕ ПРАВИЛА И ОТРАБОТКА ===");
-        io.print("""
-                УРОКИ ПО ТЕМАМ
-                [1] Настоящее время
-                [2] Будущее время
-                [3] Прошедшее время
-                """);
-        String choice = io.readline();
-
-        switch (choice) {
-            case "1":
-                this.rule = getPresentRule();
-                this.tasks = PRESENT_MAP;
-                this.mapName="present_simple";
+        io.print("\n ИЗУЧЕНИЕ ПРАВИЛА И ОТРАБОТКА ");
+        String[] topics = {"Настоящее", "Будущее", "Прошедшее"};
+        String[] callbacks = {"rule_present", "rule_future", "rule_past"};
+        io.printWithInlineButtons("Выбери тему:", topics, callbacks);
+    }
+    public void startTopic(InOut io,long chatId,String topic){
+        String rule;
+        Map<String, String> tasks;
+        String mapName;
+        switch (topic) {
+            case "present":
+                rule = getPresentRule();
+                tasks = PRESENT_MAP;
+                mapName="present_simple";
                 break;
-            case "2":
-                this.rule = getFutureRule();
-                this.tasks = FUTURE_MAP;
-                this.mapName="future_simple";
+            case "future":
+                rule = getFutureRule();
+                tasks = FUTURE_MAP;
+                mapName="future_simple";
                 break;
-            case "3":
-                this.rule = getPastRule();
-                this.tasks = PAST_MAP;
-                this.mapName="past_simple";
+            case "past":
+                rule = getPastRule();
+                tasks = PAST_MAP;
+                mapName="past_simple";
                 break;
             default:
                 io.print("Неверный ввод. Возврат в меню.");
                 return;
         }
-
-        io.print(rule);
+        io.print("\n" + rule);
         io.print("\n[ОТРАБОТКА]");
-        CoreUtils.processTasks(io,chatId,tasks,taskType,mapName);
+        CoreUtils.processTasks(io,chatId,tasks,"rule",mapName);
         io.sendBuffer();
     }
-
     public String getFutureRule() {
         return """
              Правило:

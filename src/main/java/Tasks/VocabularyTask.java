@@ -8,35 +8,21 @@ public class VocabularyTask implements Task {
     private static final Map<String, String> TRAVEL_MAP = createTravelVocab();
 
     @Override
-    public void start(InOut io,long chatId){
-        io.print("\n=== ЗАДАНИЕ: ПЕРЕВЕДИ СЛОВО ===");
-        printTopicMenu(io);
-        String choice = io.readline();
-        Map<String, String> vocabulary;
-
-        String mapName;
-        switch (choice.toLowerCase()) {
-            case "1","food":
-                vocabulary=FOOD_MAP;
-                mapName="food";
-                break;
-        case "2","travel":
-            vocabulary=TRAVEL_MAP;
-            mapName="travel";
-            break;
-        default:
-            io.print("Неверный ввод. Выходим из режима словаря.");
-            return;
-        }
-        if (vocabulary.isEmpty()) return;
-        CoreUtils.processTasks(io,chatId,vocabulary,"vocabulary",mapName);
+    public void start(InOut io,long chatId) {
+        io.print("\n ЗАДАНИЕ: ПЕРЕВЕДИ СЛОВО ");
+        String[] topics = {"Еда", "Путешествия"};
+        String[] callbacks = {"vocab_food", "vocab_travel"};
+        io.printWithInlineButtons("Выберите тему:", topics, callbacks);
+    }
+    public void startTopic(InOut io, long chatId, Map<String, String> vocab, String mapName) {
+        CoreUtils.processTasks(io, chatId, vocab, "vocabulary", mapName);
         io.sendBuffer();
     }
-    private void printTopicMenu(InOut io) {
-        io.print("Выберите тему:");
-        io.print("[1] Food (Еда)");
-        io.print("[2] Travel (Путешествия)");
-        io.print("Ваш выбор (номер или название): ");
+    public static Map<String, String> getFoodVocab() {
+        return new HashMap<>(FOOD_MAP);
+    }
+    public static Map<String, String> getTravelVocab() {
+         return new HashMap<>(TRAVEL_MAP);
     }
     private static Map<String, String> createFoodVocab() {
         Map<String, String> vocab = new HashMap<>();
