@@ -15,11 +15,18 @@ public class WordGuessTask implements Task {
     public void start(InOut io, long chatId) {
         io.print("\n ИГРА: УГАДАЙ СЛОВО");
 
+<<<<<<< HEAD
         io.print("Выбери уровень сложности: Легкий (3 жизни, 60 сек.), Средний (2 жизни, 45 сек.), Сложный (1 жизнь, 30 сек.)\n");
         String[] levels = {"1. Легкий", "2. Средний", "3. Сложный"};
         String[] callbacks = {"level_1", "level_2", "level_3"};
         io.printWithInlineButtons("Выбери уровень:", levels, callbacks);
         io.sendBuffer();
+=======
+        io.print("Выбери уровень сложности: Легкий (3 жизни, 60 сек.), Средний (2 жизни, 45 сек.), Сложный (1 жизнь, 30 сек.)");
+        String[] levels = {"1. Легкий", "2. Средний", "3. Сложный"};
+        String[] callbacks = {"level_1", "level_2", "level_3"};
+        io.printWithInlineButtons("Выбери уровень:", levels, callbacks);
+>>>>>>> 196780fdacbf75af3b2d844036998280423c01ff
     }
     public void startGame(InOut io,long chatId,int level){
         Map<String, String> selectedMap;
@@ -72,10 +79,18 @@ public class WordGuessTask implements Task {
                 io.print("Вопрос " + (i + 1) + "/" + totalQuestions);
                 io.print(currentDescription);
 
+<<<<<<< HEAD
                 String[] actionButtons = {" Подсказка", " Пропустить"};
                 String[] actionData = {"HELP", "SKIP"};
                 io.printWithInlineButtons("Твой ответ:", actionButtons, actionData);
                 io.sendBuffer();
+=======
+                io.sendBuffer();
+                String[] actionButtons = {" Подсказка", " Пропустить"};
+                String[] actionData = {"HELP", "SKIP"};
+                io.printWithInlineButtons("Твой ответ:", actionButtons, actionData);
+
+>>>>>>> 196780fdacbf75af3b2d844036998280423c01ff
 
                 String userInput = io.readline();
                 if (userInput == null) {
@@ -85,13 +100,21 @@ public class WordGuessTask implements Task {
 
                 String userAnswer = userInput.trim().toLowerCase();
 
+<<<<<<< HEAD
                 if ("/skip".equals(userAnswer)|| "SKIP".equalsIgnoreCase(userAnswer)) {
+=======
+                if ("/skip".equals(userAnswer)|| "SKIP".equalsIgnoreCase(userInput)) {
+>>>>>>> 196780fdacbf75af3b2d844036998280423c01ff
                     if (handleSkip(io, skipTokens)) skipTokens--;
                     else currentLife--;
                     questionAnswered = true;
                     continue;
                 }
+<<<<<<< HEAD
                 if ("/help".equals(userAnswer)|| "HELP".equalsIgnoreCase(userAnswer)) {
+=======
+                if ("/help".equals(userAnswer)|| "HELP".equalsIgnoreCase(userInput)) {
+>>>>>>> 196780fdacbf75af3b2d844036998280423c01ff
                     if (usedHelps.containsKey(currentDescription)) {
                         io.print("Подсказка по этому слову уже использована.");
                         continue;
@@ -115,6 +138,10 @@ public class WordGuessTask implements Task {
                 }
                 questionAnswered = true;
                 io.print("");
+<<<<<<< HEAD
+=======
+
+>>>>>>> 196780fdacbf75af3b2d844036998280423c01ff
             }
         }
         io.print("Игра окончена! Твой результат: " + score + " из " + totalQuestions);
@@ -191,4 +218,8 @@ public class WordGuessTask implements Task {
         map.put("Человек, который предсказывает будущее", "prophet");
         return map;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 196780fdacbf75af3b2d844036998280423c01ff
