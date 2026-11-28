@@ -155,6 +155,9 @@ public class CoreUtils {
             String correctAnswer = entry.getValue();
             io.print(taskSentence + "\n");
             String userInput = io.readline().toLowerCase();
+
+            if ("выход из задания".equals(userInput)) { return; }
+
             boolean isCorrect = userInput.equalsIgnoreCase(correctAnswer);
             if (isCorrect) {
                 io.print("Верно! \n");

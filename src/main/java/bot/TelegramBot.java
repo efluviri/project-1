@@ -86,6 +86,21 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
                 telegramClient.execute(new AnswerCallbackQuery(update.getCallbackQuery().getId()));
             } catch (TelegramApiException ignored) {}
 
+            if (data.startsWith("exit_task")) {
+                InOut currentIo = activeDialogs.get(chatId);
+                if (currentIo instanceof TelegramInOut) {
+                    ((TelegramInOut) currentIo).receiveMessage("ВЫХОД ИЗ ЗАДАНИЯ");
+                }
+                activeDialogs.remove(chatId);
+                sendMessage(chatId, "Вы вышли из задания в главное меню");
+                ((TelegramInOut) currentIo).printWithInlineButtons(
+                        "Выбери задание:",
+                        new String[]{"Заполнить пропуск", "Уроки по темам", "Переведи слово", "Игра: Угадай слово", "Статистика", "Прогресс"},
+                        new String[]{"/fillblank", "/rules", "/vocabulary", "/guess", "/stats", "/progress"}
+                );
+                return;
+            }
+
             if (data.startsWith("/")) {
                 TelegramInOut io = new TelegramInOut(chatId, telegramClient);
                 switch (data) {
@@ -181,7 +196,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             if (activeDialogs.containsKey(chatId)) {
                 InOut currentIo = activeDialogs.get(chatId);
                 if (currentIo instanceof TelegramInOut) {
-                    ((TelegramInOut) currentIo).receiveCallback(data);
+                    ((TelegramInOut) currentIo).receiveMessage(data);
                 }
                 return;
             }

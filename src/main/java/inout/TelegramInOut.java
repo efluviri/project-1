@@ -59,20 +59,13 @@ public class TelegramInOut implements InOut {
         }
     }
 
-    public void receiveCallback(String data) {
-        try {
-            messageQueue.put(data);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
     public int printWithInlineButtons(String text, String[] buttons, String[] callbacks) {
         sendBuffer();
         try {
             SendMessage msg = new SendMessage(chatId.toString(), text);
             InlineKeyboardMarkup markup = new InlineKeyboardMarkup(new ArrayList<>());
             List<InlineKeyboardRow> rows = new ArrayList<>();
+
             for (int i = 0; i < buttons.length; i++) {
                 InlineKeyboardButton button = new InlineKeyboardButton(buttons[i]);
                 button.setCallbackData(callbacks[i]);
@@ -80,6 +73,13 @@ public class TelegramInOut implements InOut {
                 row.add(button);
                 rows.add(row);
             }
+
+            InlineKeyboardButton exitButton = new InlineKeyboardButton("ВЫХОД ИЗ ЗАДАНИЯ");
+            exitButton.setCallbackData("exit_task");
+            InlineKeyboardRow exitRow = new InlineKeyboardRow();
+            exitRow.add(exitButton);
+            rows.add(exitRow);
+
             markup.setKeyboard(rows);
             msg.setReplyMarkup(markup);
             org.telegram.telegrambots.meta.api.objects.message.Message sentMsg = sender.execute(msg);
