@@ -1,12 +1,10 @@
 package main.java.inout;
 
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +27,7 @@ public class TelegramInOut implements InOut {
     public void print(String message) {
         buffer.append(message).append("\n");
     }
+
     public String readline() {
         sendBuffer();
         try {
@@ -38,6 +37,7 @@ public class TelegramInOut implements InOut {
             return null;
         }
     }
+
     public void sendBuffer() {
         if (buffer.length() > 0) {
             String text = buffer.toString().trim();
@@ -58,6 +58,7 @@ public class TelegramInOut implements InOut {
             Thread.currentThread().interrupt();
         }
     }
+
     public void receiveCallback(String data) {
         try {
             messageQueue.put(data);
@@ -65,7 +66,8 @@ public class TelegramInOut implements InOut {
             Thread.currentThread().interrupt();
         }
     }
-    public void printWithInlineButtons(String text, String[] buttons, String[] callbacks) {
+
+    public int printWithInlineButtons(String text, String[] buttons, String[] callbacks) {
         sendBuffer();
         try {
             SendMessage msg = new SendMessage(chatId.toString(), text);
@@ -74,18 +76,42 @@ public class TelegramInOut implements InOut {
             for (int i = 0; i < buttons.length; i++) {
                 InlineKeyboardButton button = new InlineKeyboardButton(buttons[i]);
                 button.setCallbackData(callbacks[i]);
-
                 InlineKeyboardRow row = new InlineKeyboardRow();
                 row.add(button);
                 rows.add(row);
             }
             markup.setKeyboard(rows);
             msg.setReplyMarkup(markup);
-            sender.execute(msg);
+            org.telegram.telegrambots.meta.api.objects.message.Message sentMsg = sender.execute(msg);
+            return sentMsg.getMessageId();
         } catch (TelegramApiException e) {
-              e.printStackTrace();
+            e.printStackTrace();
+            return -1;
         }
     }
 
+    public void editMessage(long messageId, String newText, String[] buttons, String[] callbacks) {
+        try {
+            InlineKeyboardMarkup markup = new InlineKeyboardMarkup(new ArrayList<>());
+            List<InlineKeyboardRow> rows = new ArrayList<>();
+            for (int i = 0; i < buttons.length; i++) {
+                InlineKeyboardButton button = new InlineKeyboardButton(buttons[i]);
+                button.setCallbackData(callbacks[i]);
+                InlineKeyboardRow row = new InlineKeyboardRow();
+                row.add(button);
+                rows.add(row);
+            }
+            markup.setKeyboard(rows);
 
+            EditMessageText editMessage = EditMessageText.builder()
+                    .chatId(chatId.toString())
+                    .messageId((int) messageId)
+                    .text(newText)
+                    .replyMarkup(markup)
+                    .build();
+            sender.execute(editMessage);
+        } catch (TelegramApiException e) {
+            System.err.println("Не удалось изменить сообщение: " + e.getMessage());
+        }
+    }
 }

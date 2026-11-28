@@ -4,5 +4,5 @@ public interface InOut {
     public void print(String message);
     public String readline();
     public void sendBuffer();
-    public void printWithInlineButtons(String text, String[] buttons, String[] callbacks);
+    public int printWithInlineButtons(String text, String[] buttons, String[] callbacks);
 }

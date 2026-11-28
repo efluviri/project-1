@@ -1,6 +1,9 @@
 package main.java.Tasks;
 import main.java.inout.*;
 import main.java.inout.InOut;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.sql.*;
 
@@ -27,6 +30,19 @@ public class CoreUtils {
         } catch (SQLException e) {
             io.print(" Не удалось создать таблицу базы данных: " + e.getMessage());
         }
+    }
+    public static List<Long> getInactiveUsers(int hours) {
+        List<Long> result = new ArrayList<>();
+        String sql = "SELECT DISTINCT user_id FROM user_answers WHERE timestamp < datetime('now', ? || ' hours')";
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "-" + hours);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next())
+                    result.add(Long.parseLong(rs.getString("user_id")));
+            }
+        } catch (Exception e) {System.err.println("Таймер: " + e.getMessage()); }
+        return result;
     }
 
     public static void logAnswer(long userId, String taskId, boolean isCorrect, InOut io) {
