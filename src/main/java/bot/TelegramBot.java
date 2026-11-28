@@ -1,4 +1,5 @@
 package main.java.bot;
+
 import java.util.Map;
 import main.java.inout.*;
 import main.java.Tasks.*;
@@ -20,6 +21,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
     private final TelegramClient telegramClient;
     private final Map<Long, TelegramInOut> activeDialogs = new ConcurrentHashMap<>();
     private final ExecutorService taskExecutor = Executors.newCachedThreadPool();
+
     private final TimerService timerService;
 
     public TelegramBot() {
@@ -41,7 +43,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
         }
 
         this.telegramClient = new OkHttpTelegramClient(BOT_TOKEN);
+
         this.timerService = new TimerService(telegramClient);
+
         try {
             CoreUtils.initDatabase(new TelegramInOut(0L, telegramClient));
         } catch (Exception e) {
@@ -52,6 +56,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
     @Override
     public void run() {
         System.out.println("Запуск бота...");
+        timerService.start();
+
         try (TelegramBotsLongPollingApplication app = new TelegramBotsLongPollingApplication()) {
             app.registerBot(BOT_TOKEN, this);
             System.out.println("Бот успешно запущен и ждет сообщений!");
@@ -68,16 +74,6 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             telegramClient.execute(message);
         } catch (TelegramApiException e) {
             System.err.println("Ошибка отправки: " + e.getMessage());
-        }
-    }
-
-    public void sendMessageWithPersistentButtons(long chatId, String text, String[] buttonTexts) {
-        SendMessage message = new SendMessage(String.valueOf(chatId), text);
-        message.setReplyMarkup(ButtonUtils.createPersistentKeyboard(buttonTexts));
-        try {
-            telegramClient.execute(message);
-        } catch (TelegramApiException e) {
-            System.err.println("Ошибка отправки кнопок: " + e.getMessage());
         }
     }
 
@@ -108,10 +104,20 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
                     case "/stats":
                         CoreUtils.printAllTimeStats(chatId, io);
                         io.sendBuffer();
+                        io.printWithInlineButtons(
+                                "Выбери задание:",
+                                new String[]{"Заполнить пропуск", "Уроки по темам", "Переведи слово", "Игра: Угадай слово", "Статистика", "Прогресс"},
+                                new String[]{"/fillblank", "/rules", "/vocabulary", "/guess", "/stats", "/progress"}
+                        );
                         break;
                     case "/progress":
                         CoreUtils.printProgress(chatId, io);
                         io.sendBuffer();
+                        io.printWithInlineButtons(
+                                "Выбери задание:",
+                                new String[]{"Заполнить пропуск", "Уроки по темам", "Переведи слово", "Игра: Угадай слово", "Статистика", "Прогресс"},
+                                new String[]{"/fillblank", "/rules", "/vocabulary", "/guess", "/stats", "/progress"}
+                        );
                         break;
                     default:
                         sendMessage(chatId, "Неизвестная команда.");
@@ -120,8 +126,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
                 return;
             }
 
-            if(data.startsWith("vocab_")){
-                String topic=data.substring(6);
+            if (data.startsWith("vocab_")) {
+                String topic = data.substring(6);
                 TelegramInOut io = new TelegramInOut(chatId, telegramClient);
                 activeDialogs.put(chatId, io);
                 VocabularyTask task = new VocabularyTask();
@@ -129,54 +135,53 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
                     try {
                         if ("food".equals(topic)) {
                             task.startTopic(io, chatId, VocabularyTask.getFoodVocab(), "food");
-                        }
-                        else if ("travel".equals(topic)) {
+                        } else if ("travel".equals(topic)) {
                             task.startTopic(io, chatId, VocabularyTask.getTravelVocab(), "travel");
                         }
+                    } finally {
+                        activeDialogs.remove(chatId);
                     }
-                finally { activeDialogs.remove(chatId);}
                 });
                 return;
             }
-            if(data.startsWith("rule")){
-                String topic=data.substring(5);
+            if (data.startsWith("rule")) {
+                String topic = data.substring(5);
                 TelegramInOut io = new TelegramInOut(chatId, telegramClient);
                 activeDialogs.put(chatId, io);
                 RuleTask task = new RuleTask();
                 taskExecutor.submit(() -> {
                     try {
                         task.startTopic(io, chatId, topic);
+                    } finally {
+                        activeDialogs.remove(chatId);
                     }
-                finally {activeDialogs.remove(chatId); }
                 });
                 return;
             }
             if (data.startsWith("level_")) {
                 int level = Integer.parseInt(data.substring(6));
-                TelegramInOut gameIo = new TelegramInOut(chatId,telegramClient);
+                TelegramInOut gameIo = new TelegramInOut(chatId, telegramClient);
                 activeDialogs.put(chatId, gameIo);
+
                 taskExecutor.submit(() -> {
-                    try { WordGuessTask game = new WordGuessTask();
+                    try {
+                        WordGuessTask game = new WordGuessTask();
                         game.startGame(gameIo, chatId, level);
-                    } catch (Exception e) { e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                         gameIo.print("Произошла ошибка во время игры.");
                         gameIo.sendBuffer();
-                    } finally { activeDialogs.remove(chatId); }
+                    } finally {
+                        activeDialogs.remove(chatId);
+                    }
                 });
-                return;
-            }
-            if (activeDialogs.containsKey(chatId)) {
-                InOut currentIo = activeDialogs.get(chatId);
-                if (currentIo instanceof TelegramInOut) {
-                    ((TelegramInOut) currentIo).receiveMessage(data);
-                }
                 return;
             }
 
             if (activeDialogs.containsKey(chatId)) {
                 InOut currentIo = activeDialogs.get(chatId);
                 if (currentIo instanceof TelegramInOut) {
-                    ((TelegramInOut) currentIo).receiveMessage(data);
+                    ((TelegramInOut) currentIo).receiveCallback(data);
                 }
                 return;
             }
@@ -200,16 +205,15 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             String normalizedText = messageText.trim().toLowerCase();
             switch (normalizedText) {
                 case "/start":
-                    TelegramInOut startIo = new TelegramInOut(chatId, telegramClient);
-                    startIo.printWithInlineButtons(
+                    io.printWithInlineButtons(
                             "Привет! Выбери задание:",
-                            new String[]{"Заполнить пропуск", "Уроки по темам", " Переведи слово", "Игра: Угадай слово", "Статистика", "Прогресс"},
+                            new String[]{"Заполнить пропуск", "Уроки по темам", "Переведи слово", "Игра: Угадай слово", "Статистика", "Прогресс"},
                             new String[]{"/fillblank", "/rules", "/vocabulary", "/guess", "/stats", "/progress"}
                     );
                     break;
-               default:
-                   sendMessage(chatId, "Неизвестная команда. Введите /start");
-                   break;
+                default:
+                    sendMessage(chatId, "Неизвестная команда. Введите /start");
+                    break;
             }
         }
     }
@@ -224,6 +228,4 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Bot {
             }
         });
     }
-
-
 }

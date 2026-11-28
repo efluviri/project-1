@@ -19,7 +19,8 @@ public class WordGuessTask implements Task {
         String[] callbacks = {"level_1", "level_2", "level_3"};
         io.printWithInlineButtons("Выбери уровень:", levels, callbacks);
     }
-    public void startGame(InOut io,long chatId,int level){
+
+    public void startGame(InOut io, long chatId, int level) {
         Map<String, String> selectedMap;
 
         switch (level) {
@@ -35,7 +36,7 @@ public class WordGuessTask implements Task {
             default:
                 selectedMap = EASY_WORDS;
         }
-        runGame(io, chatId, selectedMap,level);
+        runGame(io, chatId, selectedMap, level);
     }
 
     private void runGame(InOut io, long chatId, Map<String, String> wordsMap, int level) {
@@ -81,8 +82,6 @@ public class WordGuessTask implements Task {
 
                 String[] actionButtons = {" Подсказка", " Пропустить"};
                 String[] actionData = {"HELP", "SKIP"};
-                io.printWithInlineButtons("Твой ответ:", actionButtons, actionData);
-
                 int messageId = io.printWithInlineButtons("Твой ответ:", actionButtons, actionData);
 
                 boolean[] timeIsOut = {false};
@@ -128,14 +127,12 @@ public class WordGuessTask implements Task {
 
                 String userAnswer = userInput.trim().toLowerCase();
 
-
                 if ("/skip".equals(userAnswer) || "SKIP".equalsIgnoreCase(userInput)) {
                     if (handleSkip(io, skipTokens)) skipTokens--;
                     else currentLife--;
                     questionAnswered = true;
                     continue;
                 }
-
 
                 if ("/help".equals(userAnswer) || "HELP".equalsIgnoreCase(userInput)) {
                     if (usedHelps.containsKey(currentDescription)) {
@@ -175,12 +172,12 @@ public class WordGuessTask implements Task {
         if (skips > 0) {
             io.print("Ты пропустил слово.");
             return true;
-        }
-        else {
+        } else {
             io.print("У тебя закончились пропуска!");
             return false;
         }
     }
+
     private boolean giveHelp(String answer, int helpTokens, InOut io) {
         if (helpTokens <= 0) {
             io.print("У тебя нет доступных подсказок!");
@@ -188,12 +185,11 @@ public class WordGuessTask implements Task {
         }
         char firstLetter = Character.toUpperCase(answer.charAt(0));
         int length = answer.length();
-        io.print("\n ПОДСКАЗКА: \n"+
-                "- Первая буква: " + firstLetter +"\n"+
-                "- Количество букв: " + length+"\n"+
-                "  Осталось подсказок: " + (helpTokens-1));
+        io.print("\n ПОДСКАЗКА: \n" +
+                "- Первая буква: " + firstLetter + "\n" +
+                "- Количество букв: " + length + "\n" +
+                "  Осталось подсказок: " + (helpTokens - 1));
         return true;
-
     }
 
     private static Map<String, String> createEasyWords() {
@@ -240,4 +236,4 @@ public class WordGuessTask implements Task {
         map.put("Человек, который предсказывает будущее", "prophet");
         return map;
     }
-
+}
